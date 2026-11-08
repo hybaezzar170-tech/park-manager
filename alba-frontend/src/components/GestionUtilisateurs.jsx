@@ -17,21 +17,23 @@ function GestionUtilisateurs() {
     email: "",
     password: "",
     role: "user",
+    telephone: "",
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Filtrer les utilisateurs selon le terme de recherche
   const filteredUsers = users.filter(user => 
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.role.toLowerCase().includes(searchTerm.toLowerCase())
+    (user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (user.role && user.role.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (user.telephone && user.telephone.includes(searchTerm))
   );
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        const response = await fetch("http://127.0.0.1:8000/api/users", {
+        const response = await fetch("http://localhost:8000/api/users", {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -66,7 +68,7 @@ function GestionUtilisateurs() {
     setLoading(true);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch("http://127.0.0.1:8000/api/users", {
+      const response = await fetch("http://localhost:8000/api/users", {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${token}`,
@@ -82,7 +84,7 @@ function GestionUtilisateurs() {
         throw new Error(data.message || "Erreur lors de l'ajout de l'utilisateur");
       }
       setUsers([...users, data]);
-      setForm({ name: "", email: "", password: "", role: "user" });
+      setForm({ name: "", email: "", password: "", role: "user", telephone: "" });
       setShowModal(false);
       alert("Utilisateur ajouté avec succès!");
     } catch (error) {
@@ -96,7 +98,7 @@ function GestionUtilisateurs() {
     if (!window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) return;
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://127.0.0.1:8000/api/users/${id}`, { 
+      const response = await fetch(`http://localhost:8000/api/users/${id}`, { 
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -139,7 +141,7 @@ function GestionUtilisateurs() {
             onFocus={(e) => e.target.style.borderColor = colors.deepRed}
             onBlur={(e) => e.target.style.borderColor = colors.lightGray}
           />
-          <button onClick={() => { setShowModal(true); setForm({ name: "", email: "", password: "", role: "user" }); }} style={{ padding: "12px 24px", background: `linear-gradient(135deg, ${colors.deepRed} 0%, ${colors.darkBurgundy} 100%)`, color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: 600, fontSize: "14px", transition: "all 0.3s", boxShadow: `0 4px 12px rgba(128, 12, 31, 0.3)` }}>+ Ajouter Utilisateur</button>
+          <button onClick={() => { setShowModal(true); setForm({ name: "", email: "", password: "", role: "user", telephone: "" }); }} style={{ padding: "12px 24px", background: `linear-gradient(135deg, ${colors.deepRed} 0%, ${colors.darkBurgundy} 100%)`, color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: 600, fontSize: "14px", transition: "all 0.3s", boxShadow: `0 4px 12px rgba(128, 12, 31, 0.3)` }}>+ Ajouter Utilisateur</button>
         </div>
       </div>
       {showModal && (
@@ -153,6 +155,7 @@ function GestionUtilisateurs() {
             <form onSubmit={handleSubmit} style={{ display: "grid", gap: "15px" }}>
               <input type="text" name="name" placeholder=" Nom complet" value={form.name} onChange={handleChange} required style={{ padding: "12px 15px", border: `2px solid ${colors.lightBlue}`, borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}/>
               <input type="email" name="email" placeholder="Email" value={form.email} onChange={handleChange} required style={{ padding: "12px 15px", border: `2px solid ${colors.lightBlue}`, borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}/>
+              <input type="tel" name="telephone" placeholder="Téléphone (optionnel)" value={form.telephone} onChange={handleChange} style={{ padding: "12px 15px", border: `2px solid ${colors.lightBlue}`, borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}/>
               <input type="password" name="password" placeholder="Mot de passe" value={form.password} onChange={handleChange} required style={{ padding: "12px 15px", border: `2px solid ${colors.lightBlue}`, borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}/>
               <select name="role" value={form.role} onChange={handleChange} style={{ padding: "12px 15px", border: `2px solid ${colors.lightBlue}`, borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", backgroundColor: "#fff", color: colors.darkNavy, cursor: "pointer" }}>
                 <option value="user">User</option>
@@ -183,7 +186,7 @@ function GestionUtilisateurs() {
           borderBottom: "2px solid #e2e8f0"
         }}>
           <tr>
-            {["ID","Nom","Email","Rôle","Actions"].map(col => (
+            {["ID","Nom","Email","Téléphone","Rôle","Actions"].map(col => (
               <th key={col} style={{ 
                 padding: "16px 12px", 
                 textAlign: "left", 
@@ -199,7 +202,7 @@ function GestionUtilisateurs() {
         <tbody>
           {filteredUsers.length === 0 ? (
             <tr>
-              <td colSpan="5" style={{ 
+              <td colSpan="6" style={{ 
                 textAlign: "center", 
                 color: "#94a3b8", 
                 padding: "40px 20px",
@@ -233,6 +236,11 @@ function GestionUtilisateurs() {
                   color: "black",
                   fontSize: "14px"
                 }}>{u.email}</td>
+                <td style={{ 
+                  padding: "16px 12px", 
+                  color: "black",
+                  fontSize: "14px"
+                }}>{u.telephone || '-'}</td>
                 <td style={{ padding: "16px 12px" }}>
                   <span style={{
                     padding: "6px 12px",
@@ -243,7 +251,7 @@ function GestionUtilisateurs() {
                     color: u.role === "admin" ? "#991b1b" : "#374151",
                     border: `1px solid ${u.role === "admin" ? "#fecaca" : "#d1d5db"}`
                   }}>
-                    {(u.role || 'user').toUpperCase()}
+                    {(u.role || 'user') ? (u.role || 'user').toUpperCase() : 'USER'}
                   </span>
                 </td>
                 <td style={{ padding: "16px 12px" }}>

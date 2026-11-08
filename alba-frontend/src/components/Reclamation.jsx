@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { FiAlertTriangle, FiClock, FiCheckCircle, FiXCircle, FiMessageSquare, FiUser, FiCalendar, FiFilter, FiRefreshCw, FiEdit2 } from 'react-icons/fi';
 
 const Reclamation = ({ user }) => {
+  // Vérifier si l'utilisateur est un ouvrier
+  const isOuvrier = user?.role === 'ouvrier';
   const [reclamations, setReclamations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -39,7 +41,7 @@ const Reclamation = ({ user }) => {
     setError('');
     
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/reclamations', {
+      const response = await fetch('http://localhost:8000/api/reclamations', {
         headers: getAuthHeaders()
       });
 
@@ -69,7 +71,7 @@ const Reclamation = ({ user }) => {
 
   const handleStatusUpdate = async (reclamationId, newStatus, response = null) => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/reclamations/${reclamationId}`, {
+      const res = await fetch(`http://localhost:8000/api/reclamations/${reclamationId}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -181,44 +183,7 @@ const Reclamation = ({ user }) => {
           Réclamations
         </h2>
         <div style={{ display: 'flex', gap: '12px' }}>
-          <button
-            onClick={() => window.location.href = '/reclamation'}
-            style={{
-              padding: '8px 16px',
-              background: colors.success,
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-          >
-            <FiMessageSquare />
-            Nouvelle Réclamation
-          </button>
-          <button
-            onClick={fetchReclamations}
-            style={{
-              padding: '8px 16px',
-              background: colors.primary,
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-          >
-            <FiRefreshCw />
             Actualiser
-          </button>
         </div>
       </div>
 

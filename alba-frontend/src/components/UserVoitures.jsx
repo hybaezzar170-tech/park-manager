@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import FormLocation from "./FormLocation";
 import FormVoiture from "./FormVoiture";
 
-export default function UserVoitures({ onClose }) {
+const UserVoitures = ({ user, onClose }) => {
+  const [activeTab, setActiveTab] = useState("location");
+  
   const colors = {
     black: "#000000",
     mediumGray: "#333333",
@@ -10,40 +12,33 @@ export default function UserVoitures({ onClose }) {
     offWhite: "#f5f5f5",
     darkBurgundy: "#3C0007",
     deepRed: "#800C1F",
+    background: "#f5f5f5",
+    text: "#333333"
   };
 
-  const [activeTab, setActiveTab] = useState("location");
-
   const tabs = [
-    { id: "location", label: "Location Voiture" },
-    { id: "achat", label: "Achat Voiture" }
+    { id: "location", label: "Location" },
+    { id: "achat", label: "Achat" }
   ];
 
   const tabStyles = {
     tabContainer: {
       display: "flex",
-      gap: "12px",
-      marginBottom: "30px",
-      padding: "8px",
-      borderRadius: "20px"
+      marginBottom: "20px",
+      borderBottom: `2px solid ${colors.lightGray}`,
+      background: colors.background
     },
     tab: (isActive) => ({
-      flex: 1,
-      padding: "16px 24px",
+      padding: "15px 25px",
+      background: isActive ? colors.deepRed : "transparent",
+      color: isActive ? "#ffffff" : colors.mediumGray,
       border: "none",
-      background: isActive
-        ? "linear-gradient(135deg, rgba(128,12,31,0.9), rgba(60,0,7,0.9))"
-        : "transparent",
-      color: isActive ? "#fff" : colors.mediumGray,
       cursor: "pointer",
-      fontWeight: "700",
-      borderRadius: "16px",
-      transition: "0.3s",
-      boxShadow: isActive
-        ? "0 8px 24px rgba(128,12,31,0.4)"
-        : "none",
-      textTransform: "uppercase",
-      letterSpacing: "1px"
+      borderRadius: "8px 8px 0 0",
+      marginRight: "5px",
+      fontWeight: "600",
+      transition: "all 0.3s ease",
+      fontSize: "14px"
     }),
     content: {
       background: colors.offWhite,
@@ -55,49 +50,46 @@ export default function UserVoitures({ onClose }) {
 
   return (
     <div style={{ padding: "40px", background: colors.offWhite, minHeight: "100vh" }}>
-      
       {/* Header with close button */}
       <div style={{ position: "relative", marginBottom: "40px" }}>
         <button
           onClick={onClose}
           style={{
             position: "absolute",
-            top: "0",
+            top: "-10px",
             right: "0",
-            padding: "10px 20px",
             background: colors.deepRed,
-            color: "#fff",
+            color: "#ffffff",
             border: "none",
-            borderRadius: "8px",
+            borderRadius: "50%",
+            width: "40px",
+            height: "40px",
             cursor: "pointer",
-            fontWeight: "600",
-            fontSize: "14px",
-            transition: "all 0.3s ease",
-            zIndex: 1000
+            fontSize: "20px",
+            fontWeight: "bold",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "all 0.3s ease"
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = colors.darkBurgundy;
+            e.currentTarget.style.transform = "scale(1.1)";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = colors.deepRed;
+            e.currentTarget.style.transform = "scale(1)";
           }}
         >
-          Fermer
+          ×
         </button>
         
-        <div style={{ textAlign: "center" }}>
-          <h2 style={{
-            fontSize: "36px",
-            fontWeight: "800",
-            letterSpacing: "2px",
-            textTransform: "uppercase",
-            color: colors.black
-          }}>
-            Gestion Location & Achat
-          </h2>
-
-          <div style={{
-            width: "100px",
-            height: "4px",
-            margin: "10px auto",
-            borderRadius: "2px",
-            background: "linear-gradient(135deg, rgba(128,12,31,0.9), rgba(60,0,7,0.9))"
-          }} />
-        </div>
+        <h2 style={{ color: colors.black, marginBottom: "10px", fontSize: "28px", fontWeight: "bold" }}>
+          Gestion des Voitures
+        </h2>
+        <p style={{ color: colors.mediumGray, fontSize: "16px", marginBottom: "0" }}>
+          Gérez la location et l'achat de voitures
+        </p>
       </div>
 
       {/* Tabs */}
@@ -109,7 +101,7 @@ export default function UserVoitures({ onClose }) {
             style={tabStyles.tab(activeTab === tab.id)}
             onMouseEnter={e => {
               if (activeTab !== tab.id)
-                e.currentTarget.style.background = "rgba(128,12,31,0.2)";
+                e.currentTarget.style.background = "rgba(128,12,31,0.1)";
             }}
             onMouseLeave={e => {
               if (activeTab !== tab.id)
@@ -121,11 +113,13 @@ export default function UserVoitures({ onClose }) {
         ))}
       </div>
 
-      {/* Content */}
+      {/* Tab Content */}
       <div style={tabStyles.content}>
-        {activeTab === "location" && <FormLocation />}
-        {activeTab === "achat" && <FormVoiture />}
+        {activeTab === "location" && <FormLocation onClose={onClose} />}
+        {activeTab === "achat" && <FormVoiture onClose={onClose} />}
       </div>
     </div>
   );
-}
+};
+
+export default UserVoitures;

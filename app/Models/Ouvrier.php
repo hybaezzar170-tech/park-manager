@@ -15,6 +15,7 @@ class Ouvrier extends Model
         'type',
         'telephone',
         'email',
+        'password',
         'salaire',
         'date_embauche',
         'statut',

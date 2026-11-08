@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Ouvrier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CompteCreeMail;
 
 class OuvrierController extends Controller
 {
@@ -84,14 +86,43 @@ class OuvrierController extends Controller
         }
 
         try {
+            // Gérer le mot de passe
+            $password = null;
+            if ($request->filled('password')) {
+                // Utiliser le mot de passe fourni
+                $password = $request->password;
+                $hashedPassword = bcrypt($password);
+                $request->merge(['password' => $hashedPassword]);
+            } elseif ($request->filled('email')) {
+                // Générer un mot de passe automatiquement si email fourni mais pas de mot de passe
+                $password = strtoupper(substr($request->prenom, 0, 2)) . substr($request->nom, 0, 2) . rand(100, 999);
+                $request->merge(['password' => bcrypt($password)]);
+            }
+
             $ouvrier = Ouvrier::create($request->all());
-            
+
+            // Envoyer l'email avec les identifiants si un email est fourni
+            if ($password && $ouvrier->email) {
+                try {
+                    Mail::to($ouvrier->email)->send(new CompteCreeMail([
+                        'nom' => $ouvrier->nom,
+                        'prenom' => $ouvrier->prenom,
+                        'email' => $ouvrier->email,
+                        'password' => $password,
+                        'type' => $ouvrier->type
+                    ]));
+                } catch (\Exception $mailException) {
+                    // Continuer même si l'email échoue
+                    \Log::error('Erreur envoi email: ' . $mailException->getMessage());
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $ouvrier,
-                'message' => 'Ouvrier créé avec succès'
+                'message' => 'Ouvrier cree avec succes' . 
+                    ($password ? ' et email envoye' : '')
             ], 201);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -156,14 +187,43 @@ class OuvrierController extends Controller
         }
 
         try {
+            // Gérer le mot de passe
+            $password = null;
+            if ($request->filled('password')) {
+                // Utiliser le mot de passe fourni
+                $password = $request->password;
+                $hashedPassword = bcrypt($password);
+                $request->merge(['password' => $hashedPassword]);
+            } elseif ($request->filled('email')) {
+                // Générer un mot de passe automatiquement si email fourni mais pas de mot de passe
+                $password = strtoupper(substr($request->prenom, 0, 2)) . substr($request->nom, 0, 2) . rand(100, 999);
+                $request->merge(['password' => bcrypt($password)]);
+            }
+
             $ouvrier->update($request->all());
-            
+
+            // Envoyer l'email avec les identifiants si un email est fourni
+            if ($password && $ouvrier->email) {
+                try {
+                    Mail::to($ouvrier->email)->send(new CompteCreeMail([
+                        'nom' => $ouvrier->nom,
+                        'prenom' => $ouvrier->prenom,
+                        'email' => $ouvrier->email,
+                        'password' => $password,
+                        'type' => $ouvrier->type
+                    ]));
+                } catch (\Exception $mailException) {
+                    // Continuer même si l'email échoue
+                    \Log::error('Erreur envoi email: ' . $mailException->getMessage());
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $ouvrier,
-                'message' => 'Ouvrier mis à jour avec succès'
+                'message' => 'Ouvrier mis à jour avec succes' . 
+                    ($password ? ' et email envoye' : '')
             ]);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

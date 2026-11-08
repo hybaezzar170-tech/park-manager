@@ -10,18 +10,26 @@ class DepartementSeeder extends Seeder
     public function run(): void
     {
         $departements = [
-            ['nom' => 'Rabat-Salé-Kénitra'],
-            ['nom' => 'Casablanca-Settat'],
-            ['nom' => 'Marrakech-Safi'],
-            ['nom' => 'Fès-Meknès'],
-            ['nom' => 'Tanger-Tétouan-Al Hoceïma'],
-            ['nom' => 'Oriental'],
-            ['nom' => 'Béni Mellal-Khénifra'],
-            ['nom' => 'Souss-Massa'],
-            ['nom' => 'Guelmim-Oued Noun'],
-            ['nom' => 'Laâyoune-Sakia El Hamra'],
-            ['nom' => 'Dakhla-Oued Ed-Dahab'],
-            ['nom' => 'Drâa-Tafilalet'],
+            [
+                'nom' => 'Transport Personnel',
+                'type' => 'voiture_5_places'
+            ],
+            [
+                'nom' => 'Transport Collectif',
+                'type' => 'minibus'
+            ],
+            [
+                'nom' => 'Livraison Marchandises',
+                'type' => 'utilitaire'
+            ],
+            [
+                'nom' => 'Transport Lourd',
+                'type' => 'camion'
+            ],
+            [
+                'nom' => 'Service Client',
+                'type' => 'voiture_5_places'
+            ]
         ];
 
         foreach ($departements as $departement) {

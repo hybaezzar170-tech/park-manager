@@ -7,6 +7,7 @@ import UserParametrage from "./components/UserParametrage";
 import UserReclamation from "./components/UserReclamation";
 import Login from "./components/login";
 import logo from "./assets/autopark.png";
+import backgroundImage from "./assets/car.png";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -35,7 +36,7 @@ function App() {
       />
     );
 
-  if (currentView === "dashboard")
+  if (currentView === "dashboard") {
     return (
       user.role === 'admin' ? (
         <Dashboard
@@ -51,32 +52,91 @@ function App() {
         />
       )
     );
+  }
 
-  if (currentView === "parametrage")
-    return (
-      user.role === 'admin' ? (
-        <DashboardParametrage
+  if (currentView === "parametrage") {
+    if (user.role === 'ouvrier') {
+      return (
+        <div style={{
+          padding: "40px",
+          textAlign: "center",
+          background: "#fff3cd",
+          border: "2px solid #d32f2f",
+          borderRadius: "8px",
+          color: "#721c24",
+          padding: "20px",
+          fontFamily: "Arial, sans-serif"
+        }}>
+          <div style={{ color: "#721c24", fontSize: "18px", fontWeight: "bold", marginBottom: "15px" }}>
+            ⚠️ ACCÈS LIMITÉ
+          </div>
+          <div style={{ color: "#721c24", fontSize: "14px", lineHeight: "1.5" }}>
+            En tant qu'ouvrier, vous n'avez pas accès à cette page.<br/>
+            Veuillez contacter votre administrateur pour toute demande d'accès.
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        user.role === 'admin' ? (
+          <DashboardParametrage
+            user={user}
+            onLogout={handleLogout}
+            onClose={() => setCurrentView(null)}
+          />
+        ) : (
+          <UserParametrage
+            user={user}
+            onLogout={handleLogout}
+            onClose={() => setCurrentView(null)}
+          />
+        )
+      );
+    }
+  }
+
+  if (currentView === "reclamation") {
+    if (user.role === 'ouvrier') {
+      return (
+        <div style={{
+          padding: "40px",
+          textAlign: "center",
+          background: "#fff3cd",
+          border: "2px solid #d32f2f",
+          borderRadius: "8px",
+          color: "#721c24",
+          padding: "20px",
+          fontFamily: "Arial, sans-serif"
+        }}>
+          <div style={{ color: "#721c24", fontSize: "18px", fontWeight: "bold", marginBottom: "15px" }}>
+            ⚠️ ACCÈS REFUSÉ
+          </div>
+          <div style={{ color: "#721c24", fontSize: "14px", lineHeight: "1.5" }}>
+            En tant qu'ouvrier, vous n'avez pas accès à cette page.<br/>
+            Veuillez contacter votre administrateur pour toute demande d'accès.
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <UserReclamation
           user={user}
           onLogout={handleLogout}
           onClose={() => setCurrentView(null)}
         />
-      ) : (
-        <UserParametrage
-          user={user}
-          onLogout={handleLogout}
-          onClose={() => setCurrentView(null)}
-        />
-      )
-    );
+      );
+    }
+  }
 
-  if (currentView === "reclamation")
+  if (currentView === "voitures") {
     return (
-      <UserReclamation
+      <UserVoitures
         user={user}
         onLogout={handleLogout}
         onClose={() => setCurrentView(null)}
       />
     );
+  }
 
   return (
     <div
@@ -84,13 +144,15 @@ function App() {
         fontFamily:
           "'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif",
         minHeight: "100vh",
-        background:
-          "linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%)",
+        background: `linear-gradient(rgba(10, 10, 10, 0.3), rgba(10, 10, 10, 0.3)), url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        padding: "40px 20px",
+        padding: "20px 10px",
         position: "relative",
         overflow: "hidden",
       }}

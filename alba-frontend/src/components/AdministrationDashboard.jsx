@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import GestionUtilisateurs from "./GestionUtilisateurs";
 import Alertes from "./Alertes";
-import Reclamation from "./Reclamation";
 import Ouvriers from "./Ouvriers";
 import Fournisseurs from "./Fournisseurs";
 import logo from "../assets/whitelogo.png";
@@ -41,7 +39,7 @@ function AdministrationDashboard({ user, onLogout, onClose }) {
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/statistics", {
+        const response = await fetch("http://localhost:8000/api/statistics", {
           headers: getAuthHeaders()
         });
         
@@ -140,24 +138,10 @@ function AdministrationDashboard({ user, onLogout, onClose }) {
           />
         </div>
         <button
-          style={sidebarButtonStyle("utilisateurs")}
-          onClick={() => setSelectedModule("utilisateurs")}
-        >
-        Utilisateurs
-        </button>
-
-        <button
           style={sidebarButtonStyle("alertes")}
           onClick={() => setSelectedModule("alertes")}
         >
           Alertes
-        </button>
-
-        <button
-          style={sidebarButtonStyle("reclamations")}
-          onClick={() => setSelectedModule("reclamations")}
-        >
-          Réclamations
         </button>
 
         <button
@@ -218,10 +202,7 @@ function AdministrationDashboard({ user, onLogout, onClose }) {
         >
           Fermer
         </button>
-        
-        {selectedModule === "utilisateurs" && <GestionUtilisateurs />}
         {selectedModule === "alertes" && <Alertes />}
-        {selectedModule === "reclamations" && <Reclamation user={user} />}
         {selectedModule === "ouvriers" && <Ouvriers />}
         {selectedModule === "fournisseurs" && <Fournisseurs />}
 
@@ -234,7 +215,7 @@ function AdministrationDashboard({ user, onLogout, onClose }) {
               marginBottom: "30px",
               letterSpacing: "-0.5px"
             }}>
-              Administration Panel
+              Administration 
             </h1>
             
             <div style={{
@@ -243,11 +224,7 @@ function AdministrationDashboard({ user, onLogout, onClose }) {
               gap: "25px",
               marginBottom: "40px"
             }}>
-              <StatBox
-                title="Nombre d'utilisateurs"
-                value={statistics.users_count}
-                color={colors.darkBurgundy}
-              />
+            
               <StatBox
                 title="Nombre d'alertes"
                 value={statistics.alertes_count}

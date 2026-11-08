@@ -17,3 +17,31 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Fichiers sensibles / configuration locale
+.env.*
+!.env.example
+email_config.txt
+CONFIG_SMS_TUNISIE.md
+SMS_CONFIG.md
+GUIDE_GMAIL.md
+INSTRUCTIONS_EMAIL.txt
+test_gmail_*.php
+test_sms_*.php
+test_simple_email.php
+test_email.php
+test_user_sms.php
+configure_sms.php
+debug-login.html
+test-login.html
+
+# Frontend
+alba-frontend/node_modules
+alba-frontend/build
+
+# Sensibles (ajout)
+app/config/sms_config.json
+*.log
+storage/logs/
+setup_auth.php
+setup_complete.php

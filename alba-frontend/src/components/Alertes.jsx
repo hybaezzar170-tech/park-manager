@@ -31,7 +31,7 @@ const Alertes = () => {
 
   const fetchAlertes = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/expiration-alerts", {
+      const response = await fetch("http://localhost:8000/api/expiration-alerts", {
         headers: getAuthHeaders()
       });
       if (!response.ok) throw new Error("Failed to fetch alerts");
@@ -48,7 +48,7 @@ const Alertes = () => {
   useEffect(() => {
     setLoading(true);
     fetchAlertes();
-  }, [fetchAlertes]);
+  }, []);
 
   const getTypeColor = (type) => {
     switch (type) {
@@ -105,38 +105,33 @@ const Alertes = () => {
         </button>
       </div>
 
-      {loading ? (
-        <div style={{ textAlign: "center", padding: "40px", color: colors.grayTaupe }}>
-          <div>Chargement des alertes...</div>
-        </div>
-      ) : (
-        <table style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          backgroundColor: "white",
-          borderRadius: "12px",
-          overflow: "hidden"
-        }}>
-          <thead style={{ backgroundColor: colors.steelBlue, color: "black" }}>
+      <table style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        backgroundColor: "white",
+        borderRadius: "12px",
+        overflow: "hidden"
+      }}>
+        <thead style={{ backgroundColor: colors.steelBlue, color: "black" }}>
+          <tr>
+            <th style={{ padding: "14px", textAlign: "left", fontWeight: 600 }}>Type</th>
+            <th style={{ padding: "14px", textAlign: "left", fontWeight: 600 }}>Catégorie</th>
+            <th style={{ padding: "14px", textAlign: "left", fontWeight: 600 }}>Voiture</th>
+            <th style={{ padding: "14px", textAlign: "left", fontWeight: 600 }}>Message</th>
+            <th style={{ padding: "14px", textAlign: "left", fontWeight: 600 }}>Temps restant</th>
+            <th style={{ padding: "14px", textAlign: "left", fontWeight: 600 }}>Date d'expiration</th>
+          </tr>
+        </thead>
+        <tbody>
+          {alertes.length === 0 ? (
             <tr>
-              <th style={{ padding: "14px", textAlign: "left", fontWeight: 600 }}>Type</th>
-              <th style={{ padding: "14px", textAlign: "left", fontWeight: 600 }}>Catégorie</th>
-              <th style={{ padding: "14px", textAlign: "left", fontWeight: 600 }}>Voiture</th>
-              <th style={{ padding: "14px", textAlign: "left", fontWeight: 600 }}>Message</th>
-              <th style={{ padding: "14px", textAlign: "left", fontWeight: 600 }}>Temps restant</th>
-              <th style={{ padding: "14px", textAlign: "left", fontWeight: 600 }}>Date d'expiration</th>
-            </tr>
-          </thead>
-          <tbody>
-            {alertes.length === 0 ? (
-              <tr>
-                <td colSpan="6" style={{ textAlign: "center", padding: "30px", color: colors.grayTaupe, fontSize: "16px" }}>
+              <td colSpan="6" style={{ textAlign: "center", padding: "30px", color: colors.grayTaupe, fontSize: "16px" }}>
                    Aucune alerte d'expiration à afficher. Tous les documents sont à jour!
                 </td>
-              </tr>
-            ) : (
-              alertes.map(a => (
+            </tr>
+          ) : (
+            alertes.map(a => (
                 <tr key={a.reference_id} style={{ 
                   backgroundColor: a.urgency === 'Urgent' ? '#FFF5F5' : '#FFFAF0', 
                   borderBottom: `1px solid #e0e0e0`,
@@ -171,7 +166,6 @@ const Alertes = () => {
             )}
           </tbody>
         </table>
-      )}
     </div>
   );
 };

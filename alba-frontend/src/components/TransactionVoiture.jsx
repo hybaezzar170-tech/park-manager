@@ -124,7 +124,7 @@ export default function TransactionVoiture() {
           WebkitBackgroundClip: "text",
           backgroundClip: "text",
         }}>
-          Gestion Achat/Vente/Location
+          Gestion Contrats
         </h2>
         <div style={{
           width: "100px",

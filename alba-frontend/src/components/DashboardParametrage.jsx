@@ -32,7 +32,7 @@ function DashboardParametrage({ user, onLogout, onClose }) {
 
   const fetchStatistics = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/statistics");
+      const response = await fetch("http://localhost:8000/api/statistics");
       if (!response.ok) throw new Error("Failed to fetch statistics");
       const data = await response.json();
       console.log("Statistics data received:", data); // Debug log
@@ -244,7 +244,7 @@ function DashboardParametrage({ user, onLogout, onClose }) {
                 color={colors.orange}
               />
               <StatBox
-                title="Réparations totales"
+                title="Réparations actives"
                 value={statistics.reparations_count}
                 color={colors.deepRed}
               />

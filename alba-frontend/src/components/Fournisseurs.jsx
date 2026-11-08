@@ -21,7 +21,7 @@ function Fournisseurs() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const API_URL = "http://127.0.0.1:8000/api/fournisseurs";
+  const API_URL = "http://localhost:8000/api/fournisseurs";
 
   // Filtrer les fournisseurs selon le terme de recherche
   const filteredFournisseurs = fournisseurs.filter(fournisseur => 

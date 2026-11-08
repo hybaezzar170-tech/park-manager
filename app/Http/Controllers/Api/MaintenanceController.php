@@ -26,38 +26,50 @@ class MaintenanceController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
-                'voiture_id' => 'required|exists:voitures,id',
-                'description' => 'nullable|string',
-                'cout' => 'nullable|numeric|min:0',
-                'date_debut' => 'required|date',
-                'date_fin_prevue' => 'nullable|date|after_or_equal:date_debut',
-                'ouvrier_id' => 'nullable|exists:ouvriers,id',
-                'notes' => 'nullable|string',
-            ]);
-
-            // Update voiture status to en_maintenance
-            $voiture = Voiture::find($request->voiture_id);
-            $voiture->etat = 'en_maintenance';
-            $voiture->save();
-
-            // Create maintenance with default status
-            $maintenanceData = $request->all();
-            $maintenanceData['statut'] = 'en_cours'; // Set default status
+            // Log des données reçues
+            \Log::info('Maintenance store request:', $request->all());
             
-            $maintenance = Maintenance::create($maintenanceData);
-            $maintenance->load(['voiture', 'ouvrier']);
+            // Récupérer les données essentielles
+            $data = [
+                'voiture_id' => $request->input('voiture_id'),
+                'type_maintenance' => $request->input('type_maintenance'),
+                'description' => $request->input('description'),
+                'cout' => $request->input('cout'),
+                'date_debut' => $request->input('date_debut'),
+                'date_fin_prevue' => $request->input('date_fin_prevue'),
+                'technicien' => $request->input('technicien'),
+                'notes' => $request->input('notes'),
+                'statut' => 'en_cours'
+            ];
+            
+            \Log::info('Processed maintenance data:', $data);
+            
+            // Update voiture status to en_maintenance
+            $voiture = Voiture::find($data['voiture_id']);
+            if ($voiture) {
+                $voiture->etat = 'en_maintenance';
+                $voiture->save();
+                \Log::info('Voiture status updated to en_maintenance');
+            } else {
+                \Log::error('Voiture not found with ID: ' . $data['voiture_id']);
+            }
 
-            \Log::info('Maintenance created:', ['id' => $maintenance->id, 'voiture_id' => $maintenance->voiture_id]);
-
+            // Create maintenance
+            $maintenance = Maintenance::create($data);
+            \Log::info('Maintenance created with ID: ' . $maintenance->id);
+            
             return response()->json([
                 'success' => true,
                 'data' => $maintenance,
                 'message' => 'Maintenance created successfully'
             ], 201);
+            
         } catch (\Exception $e) {
-            \Log::error('Failed to create maintenance: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to create maintenance'], 500);
+            \Log::error('Error creating maintenance: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create maintenance: ' . $e->getMessage()
+            ], 500);
         }
     }
 

@@ -28,8 +28,23 @@ function Asvita() {
   const [visites, setVisites] = useState([]);
   const [taxes, setTaxes] = useState([]);
   const [formData, setFormData] = useState({});
+  const [showFournisseurModal, setShowFournisseurModal] = useState(false);
+  const [fournisseurForm, setFournisseurForm] = useState({
+    nom: "",
+    prenom: "",
+    type: "Vente de véhicule",
+    email: "",
+    tel: "",
+    fax: "",
+    site_web: "",
+    adresse: "",
+    ville: "",
+    code_postal: "",
+    contact: ""
+  });
+  
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/voitures", {
+    fetch("http://localhost:8000/api/voitures", {
       headers: getAuthHeaders()
     })
       .then(res => {
@@ -42,7 +57,7 @@ function Asvita() {
       .catch(err => {
         console.error("Erreur voitures:", err);
       });
-    fetch("http://127.0.0.1:8000/api/fournisseurs", {
+    fetch("http://localhost:8000/api/fournisseurs", {
       headers: getAuthHeaders()
     })
       .then(res => {
@@ -55,7 +70,7 @@ function Asvita() {
       .catch(err => {
         console.error("Erreur fournisseurs:", err);
       });
-    fetch("http://127.0.0.1:8000/api/assurances", {
+    fetch("http://localhost:8000/api/assurances", {
       headers: getAuthHeaders()
     })
       .then(res => {
@@ -68,7 +83,7 @@ function Asvita() {
       .catch(err => {
         console.error("Erreur assurances:", err);
       });
-    fetch("http://127.0.0.1:8000/api/visites", {
+    fetch("http://localhost:8000/api/visites", {
       headers: getAuthHeaders()
     })
       .then(res => {
@@ -82,7 +97,7 @@ function Asvita() {
         console.error("Erreur visites:", err);
       });
 
-    fetch("http://127.0.0.1:8000/api/taxes-circulation", {
+    fetch("http://localhost:8000/api/taxes-circulation", {
       headers: getAuthHeaders()
     })
       .then(res => {
@@ -134,7 +149,7 @@ function Asvita() {
       overflow: "hidden"
     }),
     contentContainer: {
-      background: "offWhite",
+      background: colors.offWhite,
       minHeight: "500px",
       animation: "fadeIn 0.6s ease-in-out",
       position: "relative"
@@ -145,6 +160,46 @@ function Asvita() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFournisseurChange = e => {
+    setFournisseurForm({...fournisseurForm, [e.target.name]: e.target.value});
+  };
+
+  const handleAddFournisseur = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/api/fournisseurs", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(fournisseurForm)
+      });
+      
+      if (res.ok) {
+        const newFournisseur = await res.json();
+        setFournisseurs([...fournisseurs, newFournisseur.data]);
+        setFormData(prevForm => ({ ...prevForm, fournisseur_id: newFournisseur.data.id }));
+        setShowFournisseurModal(false);
+        setFournisseurForm({
+          nom: "",
+          prenom: "",
+          type: "Vente de véhicule",
+          email: "",
+          tel: "",
+          fax: "",
+          site_web: "",
+          adresse: "",
+          ville: "",
+          code_postal: "",
+          contact: ""
+        });
+        alert("Fournisseur ajouté avec succès");
+      } else {
+        alert("Erreur lors de l'ajout du fournisseur");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Erreur de connexion");
+    }
+  };
+
   const handleFormSubmit = async e => {
     e.preventDefault();
     
@@ -153,11 +208,11 @@ function Asvita() {
       let method = "POST";
       
       if (activeTab === "assurance") {
-        url = "http://127.0.0.1:8000/api/assurances";
+        url = "http://localhost:8000/api/assurances";
       } else if (activeTab === "visite") {
-        url = "http://127.0.0.1:8000/api/visites";
+        url = "http://localhost:8000/api/visites";
       } else if (activeTab === "taxe") {
-        url = "http://127.0.0.1:8000/api/taxes-circulation";
+        url = "http://localhost:8000/api/taxes-circulation";
       }
       
       const response = await fetch(url, {
@@ -172,19 +227,19 @@ function Asvita() {
         setFormData({});
                 try {
           if (activeTab === "assurance") {
-            const res = await fetch("http://127.0.0.1:8000/api/assurances", {
+            const res = await fetch("http://localhost:8000/api/assurances", {
               headers: getAuthHeaders()
             });
             const data = await res.json();
             setAssurances(data);
           } else if (activeTab === "visite") {
-            const res = await fetch("http://127.0.0.1:8000/api/visites", {
+            const res = await fetch("http://localhost:8000/api/visites", {
               headers: getAuthHeaders()
             });
             const data = await res.json();
             setVisites(data);
           } else if (activeTab === "taxe") {
-            const res = await fetch("http://127.0.0.1:8000/api/taxes-circulation", {
+            const res = await fetch("http://localhost:8000/api/taxes-circulation", {
               headers: getAuthHeaders()
             });
             const data = await res.json();
@@ -236,8 +291,7 @@ function Asvita() {
           letterSpacing: "2px",
           textTransform: "uppercase"
         }}>
-          Gestion Assurances/Visite/Taxe
-        </h2>
+Documents de voitures        </h2>
         <div style={{
           width: "100px",
           height: "4px",
@@ -287,10 +341,8 @@ function Asvita() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            style={{
-              ...tabStyles.tab(activeTab === tab.id),
-              ...(activeTab === tab.id ? { className: "tab-active" } : {})
-            }}
+            className={activeTab === tab.id ? "tab-active" : ""}
+            style={tabStyles.tab(activeTab === tab.id)}
             onMouseEnter={(e) => {
               if (activeTab !== tab.id) {
                 e.target.style.background = "rgba(128, 12, 31, 0.2)";
@@ -310,9 +362,6 @@ function Asvita() {
               justifyContent: "center",
               gap: "8px"
             }}>
-              {tab.id === "assurance"}
-              {tab.id === "visite"}
-              {tab.id === "taxe"}
               {tab.label}
             </span>
           </button>
@@ -327,8 +376,13 @@ function Asvita() {
             <div>
               <h3 style={{ color: "black", marginBottom: "20px", fontSize: "24px", fontWeight: "700" }}>Gestion des Assurances</h3>
             
-            <form onSubmit={handleFormSubmit} style={{ marginBottom: "25px", padding: "20px", border: `2px solid ${colors.deepRed}`, borderRadius: "8px", background: "white" }}>
-              <h4 style={{ color: colors.black, marginBottom: "15px" }}>Ajouter/Modifier Assurance</h4>
+            <form onSubmit={handleFormSubmit} style={{ 
+              marginBottom: "25px", 
+              padding: "20px", 
+              border: `2px solid ${colors.deepRed}`, 
+              borderRadius: "8px", 
+              background: "white"
+            }}>
               
               <div style={{ marginBottom: "15px" }}>
                 <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Voiture</label>
@@ -370,6 +424,8 @@ function Asvita() {
                 </select>
               </div>
 
+              
+
               <div style={{ marginBottom: "15px" }}>
                 <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Date de début</label>
                 <input type="date" name="date_debut" value={formData.date_debut || ""} onChange={handleFormChange} 
@@ -385,7 +441,7 @@ function Asvita() {
               </div>
 
               <div style={{ marginBottom: "15px" }}>
-                <label style={{ display: "block", marginBottom: "5px", color: colors.darkNavy, fontSize: "14px" }}>Date d'expiration</label>
+                <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Date d'expiration</label>
                 <input type="date" name="date_expiration" value={formData.date_expiration || ""} onChange={handleFormChange} 
                   style={{
                     width: "100%",
@@ -400,37 +456,46 @@ function Asvita() {
 
               <div style={{ marginBottom: "15px" }}>
                 <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Fournisseur</label>
-                <select name="fournisseur_id" value={formData.fournisseur_id || ""} onChange={handleFormChange}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    border: `1px solid ${colors.lightGray}`,
-                    borderRadius: "6px",
-                    fontSize: "14px",
-                    boxSizing: "border-box",
-                    backgroundColor: "white",
-                    color: colors.black
-                  }}
-                >
-                  <option value="">-- Sélectionner un fournisseur --</option>
-                  {fournisseurs.filter(f => f.type === 'Assurance').map(f => <option key={f.id} value={f.id}>{f.nom}</option>)}
-                </select>
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                  <select name="fournisseur_id" value={formData.fournisseur_id || ""} onChange={handleFormChange}
+                    style={{
+                      flex: 1,
+                      padding: "10px",
+                      border: `1px solid ${colors.lightGray}`,
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                      boxSizing: "border-box",
+                      backgroundColor: "white",
+                      color: colors.black
+                    }}
+                  >
+                    <option value="">-- Sélectionner un fournisseur --</option>
+                    {fournisseurs.filter(f => f.type === 'Assurance').map(f => <option key={f.id} value={f.id}>{f.nom}</option>)}
+                  </select>
+                  <button 
+                    type="button" 
+                    style={{ 
+                      padding: "10px 20px", 
+                      background: `linear-gradient(135deg, ${colors.grayTaupe} 0%, ${colors.mediumGray} 100%)`, 
+                      color: "#fff", 
+                      border: "none", 
+                      borderRadius: "6px", 
+                      cursor: "pointer", 
+                      fontWeight: 600, 
+                      fontSize: "14px", 
+                      transition: "all 0.3s",
+                      whiteSpace: "nowrap"
+                    }}
+                    onClick={() => {
+                      setShowFournisseurModal(true);
+                    }}
+                  >
+                    + Nouveau Fournisseur
+                  </button>
+                </div>
               </div>
 
-              <div style={{ marginBottom: "15px" }}>
-                <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Note</label>
-                <input type="text" name="note" value={formData.note || ""} onChange={handleFormChange} placeholder="Note" 
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    border: `1px solid ${colors.lightGray}`,
-                    borderRadius: "6px",
-                    fontSize: "14px",
-                    boxSizing: "border-box"
-                  }}
-                />
-              </div>
-
+              
               <div style={{ display: "flex", gap: "10px" }}>
                 <button type="submit" style={{ 
                   flex: 1,
@@ -448,47 +513,36 @@ function Asvita() {
                 >Enregistrer</button>
               </div>
             </form>
-
-            {/* Tableau des assurances */}
-            <table style={{ 
-              width: "100%", 
-              borderCollapse: "collapse",
-              borderRadius: "8px",
-              overflow: "hidden", 
-              backgroundColor: "white"
-            }}>
-              <thead style={{ background: colors.mediumGray, color: "#fff" }}>
-                <tr>
-                  <th style={{ padding: "12px", textAlign: "left" }}>Matricule</th>
-                  <th style={{ padding: "12px", textAlign: "left" }}>Date Expiration</th>
-                  <th style={{ padding: "12px", textAlign: "left" }}>Fournisseur</th>
-                  <th style={{ padding: "12px", textAlign: "left" }}>Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {voitures.map(v => {
-                  const assurance = v.assurance;
-                  return (
-                    <tr key={v.id} style={{ borderBottom: `1px solid ${colors.lightGray}`, color: colors.black }}>
-                      <td style={{ padding: "12px" }}>{v.matricule}</td>
-                      <td style={{ padding: "12px" }}>{assurance?.date_expiration || "-"}</td>
-                      <td style={{ padding: "12px" }}>{fournisseurs.find(f => f.id === assurance?.fournisseur_id)?.nom || "-"}</td>
-                      <td style={{ padding: "12px" }}>{assurance?.note || "-"}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
           </div>
         )}
 
         {activeTab === "visite" && (
           <div>
-            <h3 style={{ color: colors.black, marginBottom: "20px" }}>Gestion des Visites Techniques</h3>
             
-            <form onSubmit={handleFormSubmit} style={{ marginBottom: "25px", padding: "20px", border: `2px solid ${colors.deepRed}`, borderRadius: "8px", background: "white" }}>
-              <h4 style={{ color: colors.black, marginBottom: "15px" }}>Ajouter/Modifier Visite Technique</h4>
+            <form onSubmit={handleFormSubmit} style={{ 
+              marginBottom: "25px", 
+              padding: "20px", 
+              border: `2px solid ${colors.deepRed}`, 
+              borderRadius: "8px", 
+              background: "white"
+            }}>
               
+              <div style={{ marginBottom: "15px" }}>
+                <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Date de visite</label>
+                <input type="date" name="date_visite" value={formData.date_visite || ""} onChange={handleFormChange} 
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    border: `1px solid ${colors.lightGray}`,
+                    borderRadius: "6px",
+                    fontSize: "14px",
+                    boxSizing: "border-box"
+                  }}
+                />
+              </div>
+
+             
+
               <div style={{ marginBottom: "15px" }}>
                 <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Voiture</label>
                 <select name="voiture_id" value={formData.voiture_id || ""} onChange={handleFormChange}
@@ -509,20 +563,6 @@ function Asvita() {
               </div>
 
               <div style={{ marginBottom: "15px" }}>
-                <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Date de visite</label>
-                <input type="date" name="date_visite" value={formData.date_visite || ""} onChange={handleFormChange} 
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    border: `1px solid ${colors.lightGray}`,
-                    borderRadius: "6px",
-                    fontSize: "14px",
-                    boxSizing: "border-box"
-                  }}
-                />
-              </div>
-
-              <div style={{ marginBottom: "15px" }}>
                 <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Prochaine visite</label>
                 <input type="date" name="prochaine_visite" value={formData.prochaine_visite || ""} onChange={handleFormChange} 
                   style={{
@@ -536,20 +576,7 @@ function Asvita() {
                 />
               </div>
 
-              <div style={{ marginBottom: "15px" }}>
-                <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Note</label>
-                <input type="text" name="note" value={formData.note || ""} onChange={handleFormChange} placeholder="Note" 
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    border: `1px solid ${colors.lightGray}`,
-                    borderRadius: "6px",
-                    fontSize: "14px",
-                    boxSizing: "border-box"
-                  }}
-                />
-              </div>
-
+              
               <div style={{ display: "flex", gap: "10px" }}>
                 <button type="submit" style={{ 
                   flex: 1,
@@ -567,44 +594,21 @@ function Asvita() {
                 >Enregistrer</button>
               </div>
             </form>
-
-            <table style={{ 
-              width: "100%", 
-              borderCollapse: "collapse",
-              borderRadius: "8px",
-              overflow: "hidden",
-              backgroundColor: "white"
-            }}>
-              <thead style={{ background: colors.mediumGray, color: "#fff" }}>
-                <tr>
-                  <th style={{ padding: "12px", textAlign: "left" }}>Matricule</th>
-                  <th style={{ padding: "12px", textAlign: "left" }}>Prochaine Visite</th>
-                  <th style={{ padding: "12px", textAlign: "left" }}>Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {voitures.map(v => {
-                  const visite = v.visite;
-                  return (
-                    <tr key={v.id} style={{ borderBottom: `1px solid ${colors.lightGray}`, color: colors.black }}>
-                      <td style={{ padding: "12px" }}>{v.matricule}</td>
-                      <td style={{ padding: "12px" }}>{visite?.prochaine_visite || "-"}</td>
-                      <td style={{ padding: "12px" }}>{visite?.note || "-"}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
           </div>
         )}
 
         {activeTab === "taxe" && (
           <div>
-            <h3 style={{ color: colors.black, marginBottom: "20px" }}>Gestion des Taxes de Circulation</h3>
             
-            <form onSubmit={handleFormSubmit} style={{ marginBottom: "25px", padding: "20px", border: `2px solid ${colors.deepRed}`, borderRadius: "8px", background: "white" }}>
-              <h4 style={{ color: colors.black, marginBottom: "15px" }}>Ajouter/Modifier Taxe de Circulation</h4>
+            <form onSubmit={handleFormSubmit} style={{ 
+              marginBottom: "25px", 
+              padding: "20px", 
+              border: `2px solid ${colors.deepRed}`, 
+              borderRadius: "8px", 
+              background: "white"
+            }}>
               
+            
               <div style={{ marginBottom: "15px" }}>
                 <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Voiture</label>
                 <select name="voiture_id" value={formData.voiture_id || ""} onChange={handleFormChange}
@@ -653,7 +657,7 @@ function Asvita() {
               </div>
 
               <div style={{ marginBottom: "15px" }}>
-                <label style={{ display: "block", marginBottom: "5px", color: colors.darkNavy, fontSize: "14px" }}>Date d'expiration</label>
+                <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Date d'expiration</label>
                 <input type="date" name="date_expiration" value={formData.date_expiration || ""} onChange={handleFormChange} 
                   style={{
                     width: "100%",
@@ -686,20 +690,7 @@ function Asvita() {
                 </select>
               </div>
 
-              <div style={{ marginBottom: "15px" }}>
-                <label style={{ display: "block", marginBottom: "5px", color: colors.black, fontSize: "14px" }}>Note</label>
-                <input type="text" name="note" value={formData.note || ""} onChange={handleFormChange} placeholder="Note" 
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    border: `1px solid ${colors.lightGray}`,
-                    borderRadius: "6px",
-                    fontSize: "14px",
-                    boxSizing: "border-box"
-                  }}
-                />
-              </div>
-
+              
               <div style={{ display: "flex", gap: "10px" }}>
                 <button type="submit" style={{ 
                   flex: 1,
@@ -717,36 +708,6 @@ function Asvita() {
                 >Enregistrer</button>
               </div>
             </form>
-
-            <table style={{ 
-              width: "100%", 
-              borderCollapse: "collapse",
-              borderRadius: "8px",
-              overflow: "hidden",
-              backgroundColor: "white"
-            }}>
-              <thead style={{ background: colors.mediumGray, color: "#fff" }}>
-                <tr>
-                  <th style={{ padding: "12px", textAlign: "left" }}>Matricule</th>
-                  <th style={{ padding: "12px", textAlign: "left" }}>Date Expiration</th>
-                  <th style={{ padding: "12px", textAlign: "left" }}>Montant</th>
-                  <th style={{ padding: "12px", textAlign: "left" }}>Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {voitures.map(v => {
-                  const taxe = v.taxecirculation;
-                  return (
-                    <tr key={v.id} style={{ borderBottom: `1px solid ${colors.lightGray}`, color: colors.black }}>
-                      <td style={{ padding: "12px" }}>{v.matricule}</td>
-                      <td style={{ padding: "12px" }}>{taxe?.date_expiration || "-"}</td>
-                      <td style={{ padding: "12px" }}>{taxe?.montant || "-"}</td>
-                      <td style={{ padding: "12px" }}>{taxe?.note || "-"}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
           </div>
         )}
         </div>

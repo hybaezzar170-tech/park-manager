@@ -13,22 +13,138 @@ function GestionDepartement() {
   };
 
   const [departements, setDepartements] = useState([]);
+  const [filteredDepartements, setFilteredDepartements] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false); 
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null); 
-  const [form, setForm] = useState({ nom: "" });
+  const [form, setForm] = useState({ nom: "", type: "", etat: "actif" });
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/departements")
+    fetch("http://localhost:8000/api/departements?all=true")
       .then(res => res.json())
-      .then(data => setDepartements(data))
-      .catch(err => console.error("Error fetching departements:", err));
+      .then(data => {
+        // S'assurer que data est un tableau
+        if (Array.isArray(data)) {
+          setDepartements(data);
+          setFilteredDepartements(data);
+        } else if (data && Array.isArray(data.data)) {
+          setDepartements(data.data);
+          setFilteredDepartements(data.data);
+        } else {
+          console.error("Données reçues invalides:", data);
+          setDepartements([]);
+          setFilteredDepartements([]);
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching departements:", err);
+        setDepartements([]);
+        setFilteredDepartements([]);
+      });
   }, []);
 
-  const handleChange = e => setForm({ nom: e.target.value });
+  // Effet pour filtrer les départements
+  useEffect(() => {
+    const filtered = departements.filter(departement =>
+      departement.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (departement.type && departement.type.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      departement.etat.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredDepartements(filtered);
+  }, [searchTerm, departements]);
+
+  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const generatePDF = (departements, title) => {
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>${title}</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+          color: #333;
+        }
+        h1 {
+          color: #800C1F;
+          text-align: center;
+          margin-bottom: 30px;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+        }
+        th, td {
+          border: 1px solid #ddd;
+          padding: 12px;
+          text-align: left;
+        }
+        th {
+          background-color: #f5f5f5;
+          font-weight: bold;
+          color: #333;
+        }
+        tr:nth-child(even) {
+          background-color: #f9f9f9;
+        }
+        .footer {
+          margin-top: 30px;
+          text-align: center;
+          color: #666;
+          font-size: 12px;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Liste des Départements</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Type</th>
+            <th>État</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${departements.map(departement => `
+            <tr>
+              <td>${departement.id}</td>
+              <td>${departement.nom || ''}</td>
+              <td>${departement.type === 'voiture_5_places' ? 'Voiture 5 places' :
+                       departement.type === 'minibus' ? 'Minibus' :
+                       departement.type === 'utilitaire' ? 'Utilitaire' :
+                       departement.type === 'camion' ? 'Camion' :
+                       departement.type || 'Non défini'}</td>
+              <td>${departement.etat === 'actif' ? 'Actif' : 'Inactif'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div class="footer">
+        Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}
+      </div>
+    </body>
+    </html>
+  `;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 500);
+  };
 
   const handleEdit = departement => {
-    setForm({ nom: departement.nom });
+    setForm({ nom: departement.nom, type: departement.type || "", etat: departement.etat || "actif" });
     setIsEditing(true);
     setEditingId(departement.id);
     setShowModal(true);
@@ -38,8 +154,8 @@ function GestionDepartement() {
     e.preventDefault();
     const method = isEditing ? "PUT" : "POST";
     const url = isEditing 
-      ? `http://127.0.0.1:8000/api/departements/${editingId}`
-      : "http://127.0.0.1:8000/api/departements";
+      ? `http://localhost:8000/api/departements/${editingId}`
+      : "http://localhost:8000/api/departements";
 
     fetch(url, {
       method: method,
@@ -50,12 +166,12 @@ function GestionDepartement() {
       .then(data => {
         if (isEditing) {
           alert("Département modifié !");
-          setDepartements(departements.map(d => d.id === editingId ? data.data : d));
+          setDepartements(departements.map(d => d.id === editingId ? (data.data || data) : d));
         } else {
           alert("Département ajouté !");
-          setDepartements([...departements, data.data]);
+          setDepartements([...departements, data.data || data]);
         }
-        setForm({ nom: "" });
+        setForm({ nom: "", type: "", etat: "actif" });
         setShowModal(false);
         setIsEditing(false);
         setEditingId(null);
@@ -63,27 +179,71 @@ function GestionDepartement() {
       .catch(err => console.error("Error:", err));
   };
 
-  const handleDelete = id => {
-    fetch(`http://127.0.0.1:8000/api/departements/${id}`, { method: "DELETE" })
-      .then(() => setDepartements(departements.filter(d => d.id !== id)))
-      .catch(err => console.error(err));
+  const handleToggleEtat = id => {
+    fetch(`http://localhost:8000/api/departements/${id}/toggle-etat`, { 
+      method: "PUT",
+      headers: { "Content-Type": "application/json" }
+    })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        setDepartements(departements.map(d => d.id === id ? (data.data || data) : d));
+      })
+      .catch(err => console.error("Error:", err));
   };
   return (
     <div style={{ padding: "30px", backgroundColor: colors.offWhite, borderRadius: "12px" }}>
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center", 
-        marginBottom: "20px" 
+      <h1 style={{ 
+        color: colors.black, 
+        fontSize: "32px", 
+        fontWeight: 800, 
+        margin: "0 0 10px 0",
+        textAlign: "center",
+        textTransform: "uppercase",
+        letterSpacing: "2px",
+        background: `linear-gradient(135deg, ${colors.deepRed} 0%, ${colors.darkBurgundy} 100%)`,
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        backgroundClip: "text"
       }}>
-        <h2 style={{ 
-          color: colors.black, 
-          fontSize: "28px", 
-          fontWeight: 700, 
-          margin: 0 
-        }}>
-          Gestion des Départements
-        </h2>
+        Gestion des Départements
+      </h1>
+
+      <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "20px", justifyContent: "center" }}>
+        <input
+          type="text"
+          placeholder="Rechercher par nom, type ou état..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            padding: "12px 16px",
+            border: `2px solid ${colors.lightGray}`,
+            borderRadius: "8px",
+            fontSize: "14px",
+            width: "300px",
+            fontFamily: "inherit",
+            transition: "all 0.3s ease",
+            outline: "none"
+          }}
+          onFocus={(e) => e.target.style.borderColor = colors.deepRed}
+          onBlur={(e) => e.target.style.borderColor = colors.lightGray}
+        />
+        <button 
+          onClick={() => generatePDF(filteredDepartements, "Liste des Départements")}
+          style={{
+            padding: "12px 24px",
+            backgroundColor: colors.mediumGray,
+            color: "#fff",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: 600,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+            transition: "all 0.3s"
+          }}
+        >
+          PDF
+        </button>
         <button 
           onClick={() => setShowModal(true)} 
           style={{
@@ -116,7 +276,7 @@ function GestionDepartement() {
           borderBottom: "2px solid #e2e8f0"
         }}>
           <tr>
-            {["ID","Nom","Actions"].map(col => (
+            {["ID","Nom","Type","État","Actions"].map(col => (
               <th key={col} style={{ 
                 padding: "16px 12px", 
                 textAlign: "left", 
@@ -130,22 +290,23 @@ function GestionDepartement() {
           </tr>
         </thead>
         <tbody>
-          {departements.length === 0 ? (
+          {!Array.isArray(filteredDepartements) || filteredDepartements.length === 0 ? (
             <tr>
-              <td colSpan="3" style={{ 
+              <td colSpan="5" style={{ 
                 textAlign: "center", 
                 color: "#94a3b8", 
                 padding: "40px 20px",
                 fontSize: "14px",
                 backgroundColor: "#fafbfc"
               }}>
-                Aucun département disponible
+                {!Array.isArray(filteredDepartements) ? "Erreur de chargement des départements" : 
+                 searchTerm ? "Aucun département trouvé pour cette recherche" : "Aucun département disponible"}
               </td>
             </tr>
           ) : (
-            departements.map((d, index) => (
+            filteredDepartements.map((d, index) => (
               <tr key={d.id} style={{ 
-                borderBottom: `1px solid ${index === departements.length - 1 ? "transparent" : "white"}`,
+                borderBottom: `1px solid ${index === filteredDepartements.length - 1 ? "transparent" : "white"}`,
                 backgroundColor: index % 2 === 0 ? "#ffffff" : "white",
                 transition: "all 0.2s ease"
               }}>
@@ -161,6 +322,54 @@ function GestionDepartement() {
                   fontWeight: "500",
                   fontSize: "14px"
                 }}>{d.nom}</td>
+                <td style={{ 
+                  padding: "16px 12px", 
+                  color: "black",
+                  fontSize: "14px"
+                }}>
+                  <span style={{
+                    padding: "4px 8px",
+                    borderRadius: "12px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    backgroundColor: 
+                      d.type === 'voiture_5_places' ? "#e0f2fe" :
+                      d.type === 'minibus' ? "#fef3e2" :
+                      d.type === 'utilitaire' ? "#f0fdf4" :
+                      d.type === 'camion' ? "#fefce8" :
+                      "#f3f4f6",
+                    color: 
+                      d.type === 'voiture_5_places' ? "#0369a1" :
+                      d.type === 'minibus' ? "#d97706" :
+                      d.type === 'utilitaire' ? "#166534" :
+                      d.type === 'camion' ? "#ca8a04" :
+                      "#6b7280"
+                  }}>
+                    {d.type === 'voiture_5_places' ? 'Voiture 5 places' :
+                     d.type === 'minibus' ? 'Minibus' :
+                     d.type === 'utilitaire' ? 'Utilitaire' :
+                     d.type === 'camion' ? 'Camion' :
+                     d.type || 'Non défini'}
+                  </span>
+                </td>
+                <td style={{ 
+                  padding: "16px 12px", 
+                  color: "black",
+                  fontSize: "14px"
+                }}>
+                  <span style={{
+                    padding: "4px 8px",
+                    borderRadius: "12px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    backgroundColor: 
+                      d.etat === 'actif' ? "#f0fdf4" : "#fef2f2",
+                    color: 
+                      d.etat === 'actif' ? "#166534" : "#dc2626"
+                  }}>
+                    {d.etat === 'actif' ? 'Actif' : 'Inactif'}
+                  </span>
+                </td>
                 <td style={{ padding: "16px 12px" }}>
                   <div style={{ display: "flex", gap: "8px" }}>
                     <button 
@@ -183,10 +392,10 @@ function GestionDepartement() {
                       Modifier
                     </button>
                     <button 
-                      onClick={() => handleDelete(d.id)} 
+                      onClick={() => handleToggleEtat(d.id)} 
                       style={{ 
                         padding: "8px 12px", 
-                        background: colors.deepRed, 
+                        background: d.etat === 'actif' ? colors.grayTaupe : colors.deepRed, 
                         color: "white", 
                         border: "none", 
                         borderRadius: "6px", 
@@ -194,12 +403,24 @@ function GestionDepartement() {
                         fontSize: "12px", 
                         fontWeight: "500",
                         transition: "all 0.2s ease",
-                        boxShadow: "0 2px 4px rgba(128, 12, 31, 0.2)"
+                        boxShadow: d.etat === 'actif' ? "0 2px 4px rgba(146, 156, 170, 0.2)" : "0 2px 4px rgba(128, 12, 31, 0.2)"
                       }}
-                      onMouseOver={(e) => e.target.style.background = colors.darkBurgundy}
-                      onMouseOut={(e) => e.target.style.background = colors.deepRed}
+                      onMouseOver={(e) => {
+                        if (d.etat === 'actif') {
+                          e.target.style.background = "#7d8a9a";
+                        } else {
+                          e.target.style.background = colors.darkBurgundy;
+                        }
+                      }}
+                      onMouseOut={(e) => {
+                        if (d.etat === 'actif') {
+                          e.target.style.background = colors.grayTaupe;
+                        } else {
+                          e.target.style.background = colors.deepRed;
+                        }
+                      }}
                     >
-                      Supprimer
+                      {d.etat === 'actif' ? 'Désactiver' : 'Activer'}
                     </button>
                   </div>
                 </td>
@@ -237,13 +458,52 @@ function GestionDepartement() {
                 required
                 style={{ padding: "10px 15px", border: `2px solid ${colors.lightBlue}`, borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}
               />
+              <select
+                name="type"
+                value={form.type}
+                onChange={handleChange}
+                style={{
+                  padding: "10px 15px",
+                  border: `2px solid ${colors.lightBlue}`,
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  fontFamily: "inherit",
+                  backgroundColor: "#fff",
+                  color: colors.black,
+                  cursor: "pointer"
+                }}
+              >
+                <option value="">Sélectionner un type...</option>
+                <option value="voiture_5_places">Voiture 5 places</option>
+                <option value="minibus">Minibus</option>
+                <option value="utilitaire">Utilitaire</option>
+                <option value="camion">Camion</option>
+              </select>
+              <select
+                name="etat"
+                value={form.etat}
+                onChange={handleChange}
+                style={{
+                  padding: "10px 15px",
+                  border: `2px solid ${colors.lightBlue}`,
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  fontFamily: "inherit",
+                  backgroundColor: "#fff",
+                  color: colors.black,
+                  cursor: "pointer"
+                }}
+              >
+                <option value="actif">Actif</option>
+                <option value="inactif">Inactif</option>
+              </select>
               <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
                 <button type="submit" style={{ flex: 1, padding: "10px", background: `linear-gradient(135deg, ${colors.deepRed} 0%, ${colors.darkBurgundy} 100%)`, color: "#fff", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", transition: "all 0.3s" }}>{isEditing ? "Modifier" : "Ajouter"}</button>
                 <button type="button" onClick={() => {
                   setShowModal(false);
                   setIsEditing(false);
                   setEditingId(null);
-                  setForm({ nom: "" });
+                  setForm({ nom: "", type: "", etat: "actif" });
                 }} style={{ flex: 1, padding: "10px", background: colors.grayTaupe, color: "#fff", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", transition: "all 0.3s" }}>Annuler</button>
               </div>
             </form>

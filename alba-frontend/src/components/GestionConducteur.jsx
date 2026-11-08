@@ -149,9 +149,11 @@ function GestionConducteur() {
     grayTaupe: "#929CAA"
   };
   const [conducteurs, setConducteurs] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [filteredConducteurs, setFilteredConducteurs] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showModal, setShowModal] = useState(false); 
   const [isEditing, setIsEditing] = useState(false);
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState(null); 
   const [form, setForm] = useState({
     nom: "",
     prenom: "",
@@ -163,38 +165,47 @@ function GestionConducteur() {
     code_postal: "",
     telephone: "",
     email: "",
+    password: "",
+    etat: "actif"
   });
   const [errors, setErrors] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
-  // Filtrer les conducteurs selon le terme de recherche
-  const filteredConducteurs = conducteurs.filter(conducteur => 
-    conducteur.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    conducteur.prenom.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Calculer les conducteurs à afficher pour la page actuelle
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentConducteurs = filteredConducteurs.slice(indexOfFirstItem, indexOfLastItem);
-
-  // Calculer le nombre total de pages
-  const totalPages = Math.ceil(filteredConducteurs.length / itemsPerPage);
-
-  // Fonctions pour la pagination
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
-  const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+  // Effet pour filtrer les conducteurs
+  useEffect(() => {
+    const filtered = conducteurs.filter(conducteur =>
+      conducteur.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      conducteur.prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      conducteur.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      conducteur.telephone.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      conducteur.etat.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredConducteurs(filtered);
+  }, [searchTerm, conducteurs]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/conducteurs", {
+    fetch("http://localhost:8000/api/conducteurs?all=true", {
       headers: { Accept: "application/json" },
     })
       .then(res => res.json())
-      .then(data => setConducteurs(data))
-      .catch(err => console.error("Error fetching conducteurs:", err));
+      .then(data => {
+        // S'assurer que data est un tableau
+        if (Array.isArray(data)) {
+          setConducteurs(data);
+          setFilteredConducteurs(data);
+        } else if (data && Array.isArray(data.data)) {
+          setConducteurs(data.data);
+          setFilteredConducteurs(data.data);
+        } else {
+          console.error("Données reçues invalides:", data);
+          setConducteurs([]);
+          setFilteredConducteurs([]);
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching conducteurs:", err);
+        setConducteurs([]);
+        setFilteredConducteurs([]);
+      });
   }, []);
 
   const handleChange = e => {
@@ -213,28 +224,47 @@ function GestionConducteur() {
       code_postal: conducteur.code_postal || "",
       telephone: conducteur.telephone || "",
       email: conducteur.email || "",
+      password: conducteur.password || "",
+      etat: conducteur.etat || "actif"
     });
     setIsEditing(true);
     setEditingId(conducteur.id);
     setShowModal(true);
     setErrors({});
   };
-  const resetForm = () => {
-    setForm({
-      nom: "",
-      prenom: "",
-      date_naissance: "",
-      date_embauche: "",
-      numero_permis: "",
-      adresse: "",
-      ville: "",
-      code_postal: "",
-      telephone: "",
-      email: "",
-    });
-    setErrors({});
-    setIsEditing(false);
-    setEditingId(null);
+
+  const handleToggleEtat = conducteur => {
+    const etat = conducteur.etat === "actif" ? "inactif" : "actif";
+    fetch(`http://localhost:8000/api/conducteurs/${conducteur.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json", 
+      },
+      body: JSON.stringify({ etat }),
+    })
+      .then(async res => {
+        const data = await res.json();
+        if (!res.ok) throw data;
+        return data;
+      })
+      .then(data => {
+        setConducteurs(
+          conducteurs.map(c => (c.id === conducteur.id ? data.data : c))
+        );
+        setFilteredConducteurs(
+          filteredConducteurs.map(c => (c.id === conducteur.id ? data.data : c))
+        );
+        alert("Etat du conducteur modifié avec succès ");
+      })
+      .catch(err => {
+        console.error("API Error:", err);
+        if (err.errors) {
+          setErrors(err.errors); 
+        } else {
+          alert("Erreur serveur ");
+        }
+      });
   };
 
   const handleSubmit = e => {
@@ -242,8 +272,8 @@ function GestionConducteur() {
 
     const method = isEditing ? "PUT" : "POST";
     const url = isEditing
-      ? `http://127.0.0.1:8000/api/conducteurs/${editingId}`
-      : "http://127.0.0.1:8000/api/conducteurs";
+      ? `http://localhost:8000/api/conducteurs/${editingId}`
+      : "http://localhost:8000/api/conducteurs";
 
     fetch(url, {
       method: method,
@@ -263,10 +293,18 @@ function GestionConducteur() {
           setConducteurs(
             conducteurs.map(c => (c.id === editingId ? data.data : c))
           );
+          setFilteredConducteurs(
+            filteredConducteurs.map(c => (c.id === editingId ? data.data : c))
+          );
           alert("Conducteur modifié avec succès ");
         } else {
           setConducteurs([...conducteurs, data.data]);
-          alert("Conducteur ajouté avec succès ");
+          setFilteredConducteurs([...filteredConducteurs, data.data]);
+          if (data.password) {
+            alert(`Conducteur ajouté avec succès !\n\nEmail: ${data.data.email}\nMot de passe: ${data.password}\n\nVeuillez communiquer ces identifiants au conducteur.`);
+          } else {
+            alert("Conducteur ajouté avec succès ");
+          }
         }
 
         setShowModal(false);
@@ -285,37 +323,60 @@ function GestionConducteur() {
   const handleDelete = id => {
     if (!window.confirm("Tu es sûr de vouloir supprimer ce conducteur ?")) return;
 
-    fetch(`http://127.0.0.1:8000/api/conducteurs/${id}`, {
+    fetch(`http://localhost:8000/api/conducteurs/${id}`, {
       method: "DELETE",
       headers: { Accept: "application/json" },
     })
       .then(res => {
         if (!res.ok) throw new Error("Delete failed");
         setConducteurs(conducteurs.filter(c => c.id !== id));
+        setFilteredConducteurs(filteredConducteurs.filter(c => c.id !== id));
       })
       .catch(err => console.error(err));
   };
 
+  const resetForm = () => {
+    setForm({
+      nom: "",
+      prenom: "",
+      date_naissance: "",
+      date_embauche: "",
+      numero_permis: "",
+      adresse: "",
+      ville: "",
+      code_postal: "",
+      telephone: "",
+      email: "",
+      password: "",
+      etat: "actif"
+    });
+    setErrors({});
+    setIsEditing(false);
+    setEditingId(null);
+  };
+
   return (
     <div style={{ padding: "20px", backgroundColor: colors.offWhite }}>
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center", 
-        marginBottom: "20px" 
-      }}>
-        <h2 style={{ 
-          color: colors.black, 
-          fontSize: "28px", 
-          fontWeight: 700, 
-          margin: 0 
+      <div style={{ textAlign: "center", marginBottom: "30px" }}>
+        <h1 style={{
+          fontSize: "32px",
+          fontWeight: "700",
+          margin: "0 0 10px 0",
+          textAlign: "center",
+          textTransform: "uppercase",
+          letterSpacing: "2px",
+          background: `linear-gradient(135deg, ${colors.deepRed} 0%, ${colors.darkBurgundy} 100%)`,
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text"
         }}>
           Gestion des Conducteurs
-        </h2>
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        </h1>
+
+        <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "20px", justifyContent: "center" }}>
           <input
             type="text"
-            placeholder="Rechercher par nom ou prénom..."
+            placeholder="Rechercher par nom, prénom, email ou état..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -323,7 +384,7 @@ function GestionConducteur() {
               border: `2px solid ${colors.lightGray}`,
               borderRadius: "8px",
               fontSize: "14px",
-              width: "250px",
+              width: "300px",
               fontFamily: "inherit",
               transition: "all 0.3s ease",
               outline: "none"
@@ -332,7 +393,23 @@ function GestionConducteur() {
             onBlur={(e) => e.target.style.borderColor = colors.lightGray}
           />
           <button 
-            onClick={() => setShowModal(true)}
+            onClick={() => generatePDF(filteredConducteurs, "Liste des Conducteurs")}
+            style={{
+              padding: "12px 24px",
+              backgroundColor: colors.mediumGray,
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: 600,
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+              transition: "all 0.3s"
+            }}
+          >
+            PDF
+          </button>
+          <button 
+            onClick={() => setShowModal(true)} 
             style={{
               padding: "12px 24px",
               backgroundColor: colors.deepRed,
@@ -346,23 +423,6 @@ function GestionConducteur() {
             }}
           >
             + Ajouter Conducteur
-          </button>
-          <button 
-            onClick={() => generatePDF(filteredConducteurs, "Liste des Conducteurs")}
-            style={{
-              padding: "12px 24px",
-              backgroundColor: colors.mediumGray,
-              color: "#fff",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontWeight: 600,
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-              transition: "all 0.3s",
-              marginLeft: "10px"
-            }}
-          >
-            � PDF
           </button>
         </div>
       </div>
@@ -382,7 +442,7 @@ function GestionConducteur() {
           borderBottom: "2px solid #e2e8f0"
         }}>
           <tr>
-            {["ID","Nom","Prénom","Email","Téléphone","Actions"].map(col => (
+            {["ID","Nom","Prénom","Email","Téléphone","État","Actions"].map(col => (
               <th key={col} style={{ 
                 padding: "16px 12px", 
                 textAlign: "left", 
@@ -396,9 +456,21 @@ function GestionConducteur() {
           </tr>
         </thead>
         <tbody>
-          {filteredConducteurs.length === 0 ? (
+          {!Array.isArray(filteredConducteurs) ? (
             <tr>
-              <td colSpan="6" style={{ 
+              <td colSpan="7" style={{ 
+                textAlign: "center", 
+                color: "#94a3b8", 
+                padding: "40px 20px",
+                fontSize: "14px",
+                backgroundColor: "#fafbfc"
+              }}>
+                Erreur de chargement des conducteurs
+              </td>
+            </tr>
+          ) : filteredConducteurs.length === 0 ? (
+            <tr>
+              <td colSpan="7" style={{ 
                 textAlign: "center", 
                 color: "#94a3b8", 
                 padding: "40px 20px",
@@ -409,9 +481,9 @@ function GestionConducteur() {
               </td>
             </tr>
           ) : (
-            currentConducteurs.map((c, index) => (
+            filteredConducteurs.map((c, index) => (
               <tr key={c.id} style={{ 
-                borderBottom: `1px solid ${index === currentConducteurs.length - 1 ? "transparent" : "white"}`,
+                borderBottom: `1px solid ${index === filteredConducteurs.length - 1 ? "transparent" : "white"}`,
                 backgroundColor: index % 2 === 0 ? "#ffffff" : "white",
                 transition: "all 0.2s ease"
               }}>
@@ -443,6 +515,24 @@ function GestionConducteur() {
                   color: "black",
                   fontSize: "14px"
                 }}>{c.telephone}</td>
+                <td style={{ 
+                  padding: "16px 12px", 
+                  color: "black",
+                  fontSize: "14px"
+                }}>
+                  <span style={{
+                    padding: "4px 8px",
+                    borderRadius: "12px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    backgroundColor: 
+                      c.etat === 'actif' ? "#f0fdf4" : "#fef2f2",
+                    color: 
+                      c.etat === 'actif' ? "#166534" : "#dc2626"
+                  }}>
+                    {c.etat === 'actif' ? 'Actif' : 'Inactif'}
+                  </span>
+                </td>
                 <td style={{ padding: "16px 12px" }}>
                   <div style={{ display: "flex", gap: "8px" }}>
                     <button 
@@ -465,10 +555,10 @@ function GestionConducteur() {
                       Modifier
                     </button>
                     <button 
-                      onClick={() => handleDelete(c.id)} 
+                      onClick={() => handleToggleEtat(c)} 
                       style={{ 
                         padding: "8px 12px", 
-                        background: colors.deepRed, 
+                        background: c.etat === 'actif' ? colors.grayTaupe : colors.deepRed, 
                         color: "white", 
                         border: "none", 
                         borderRadius: "6px", 
@@ -476,12 +566,24 @@ function GestionConducteur() {
                         fontSize: "12px", 
                         fontWeight: "500",
                         transition: "all 0.2s ease",
-                        boxShadow: "0 2px 4px rgba(128, 12, 31, 0.2)"
+                        boxShadow: c.etat === 'actif' ? "0 2px 4px rgba(146, 156, 170, 0.2)" : "0 2px 4px rgba(128, 12, 31, 0.2)"
                       }}
-                      onMouseOver={(e) => e.target.style.background = colors.darkBurgundy}
-                      onMouseOut={(e) => e.target.style.background = colors.deepRed}
+                      onMouseOver={(e) => {
+                        if (c.etat === 'actif') {
+                          e.target.style.background = "#7d8a9a";
+                        } else {
+                          e.target.style.background = colors.darkBurgundy;
+                        }
+                      }}
+                      onMouseOut={(e) => {
+                        if (c.etat === 'actif') {
+                          e.target.style.background = colors.grayTaupe;
+                        } else {
+                          e.target.style.background = colors.deepRed;
+                        }
+                      }}
                     >
-                      Supprimer
+                      {c.etat === 'actif' ? 'Désactiver' : 'Activer'}
                     </button>
                   </div>
                 </td>
@@ -491,381 +593,95 @@ function GestionConducteur() {
         </tbody>
       </table>
 
-      {/* Composant de Pagination */}
-      {filteredConducteurs.length > 0 && (
+      {showModal && (
         <div style={{
+          position: "fixed",
+          top: 0, left: 0,
+          width: "100%", height: "100%",
+          backgroundColor: "rgba(32, 45, 54, 0.7)",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          gap: "10px",
-          marginTop: "20px",
-          padding: "20px",
-          backgroundColor: "white",
-          borderRadius: "12px",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
+          zIndex: 1000
         }}>
-          <button
-            onClick={prevPage}
-            disabled={currentPage === 1}
-            style={{
-              padding: "8px 12px",
-              backgroundColor: currentPage === 1 ? colors.grayTaupe : colors.deepRed,
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: currentPage === 1 ? "not-allowed" : "pointer",
-              fontSize: "16px",
-              fontWeight: "500",
-              transition: "all 0.3s ease",
-              opacity: currentPage === 1 ? 0.5 : 1,
-              minWidth: "40px"
-            }}
-          >
-            ◀
-          </button>
-
-          <div style={{ display: "flex", gap: "5px" }}>
-            {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
-              <button
-                key={pageNumber}
-                onClick={() => paginate(pageNumber)}
+          <div style={{
+            backgroundColor: "white",
+            padding: "30px",
+            borderRadius: "12px",
+            width: "450px",
+            boxShadow: `0 10px 40px rgba(32, 45, 54, 0.3)`,
+            border: `2px solid ${colors.lightGray}`
+          }}>
+            <h3 style={{ color: colors.darkGray, marginBottom: "20px", fontSize: "20px", fontWeight: 700 }}>{isEditing ? "Modifier Conducteur" : "Ajouter Conducteur"}</h3>
+            <form onSubmit={handleSubmit} style={{ display: "grid", gap: "15px" }}>
+              <input
+                name="nom"
+                placeholder="Nom du conducteur"
+                value={form.nom}
+                onChange={handleChange}
+                required
+                style={{ padding: "10px 15px", border: `2px solid ${colors.lightGray}`, borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}
+              />
+              <input
+                name="prenom"
+                placeholder="Prénom du conducteur"
+                value={form.prenom}
+                onChange={handleChange}
+                required
+                style={{ padding: "10px 15px", border: `2px solid ${colors.lightGray}`, borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                style={{ padding: "10px 15px", border: `2px solid ${colors.lightGray}`, borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}
+              />
+              <input
+                type="tel"
+                name="telephone"
+                placeholder="Téléphone"
+                value={form.telephone}
+                onChange={handleChange}
+                required
+                style={{ padding: "10px 15px", border: `2px solid ${colors.lightGray}`, borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}
+              />
+              <input
+                type="password"
+                name="password"
+                placeholder="Mot de passe (optionnel)"
+                value={form.password}
+                onChange={handleChange}
+                style={{ padding: "10px 15px", border: `2px solid ${colors.lightGray}`, borderRadius: "8px", fontSize: "14px", fontFamily: "inherit" }}
+              />
+              <select
+                name="etat"
+                value={form.etat}
+                onChange={handleChange}
                 style={{
-                  padding: "8px 12px",
-                  backgroundColor: currentPage === pageNumber ? colors.deepRed : "white",
-                  color: currentPage === pageNumber ? "white" : colors.black,
-                  border: currentPage === pageNumber ? "none" : `1px solid ${colors.lightGray}`,
-                  borderRadius: "6px",
-                  cursor: "pointer",
+                  padding: "10px 15px",
+                  border: `2px solid ${colors.lightGray}`,
+                  borderRadius: "8px",
                   fontSize: "14px",
-                  fontWeight: "500",
-                  transition: "all 0.3s ease",
-                  minWidth: "40px"
-                }}
-                onMouseOver={(e) => {
-                  if (currentPage !== pageNumber) {
-                    e.target.style.backgroundColor = colors.lightGray;
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (currentPage !== pageNumber) {
-                    e.target.style.backgroundColor = "white";
-                  }
+                  fontFamily: "inherit",
+                  backgroundColor: "#fff",
+                  color: colors.black,
+                  cursor: "pointer"
                 }}
               >
-                {pageNumber}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={nextPage}
-            disabled={currentPage === totalPages}
-            style={{
-              padding: "8px 12px",
-              backgroundColor: currentPage === totalPages ? colors.grayTaupe : colors.deepRed,
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-              fontSize: "16px",
-              fontWeight: "500",
-              transition: "all 0.3s ease",
-              opacity: currentPage === totalPages ? 0.5 : 1,
-              minWidth: "40px"
-            }}
-          >
-            ▶
-          </button>
-        </div>
-      )}
-
-      {showModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "30px",
-              width: "90%",
-              maxWidth: "600px",
-              maxHeight: "90vh",
-              overflowY: "auto",
-              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)"
-            }}
-          >
-            <div style={{ 
-              display: "flex", 
-              justifyContent: "space-between", 
-              alignItems: "center",
-              marginBottom: "20px"
-            }}>
-              <h3 style={{ 
-                color: colors.darkGray, 
-                margin: 0, 
-                fontSize: "20px", 
-                fontWeight: "600" 
-              }}>
-                {isEditing ? "Modifier le Conducteur" : "Ajouter un Conducteur"}
-              </h3>
-              <button
-                onClick={() => {
+                <option value="actif">Actif</option>
+                <option value="inactif">Inactif</option>
+              </select>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+                <button type="submit" style={{ flex: 1, padding: "10px", background: `linear-gradient(135deg, ${colors.deepRed} 0%, ${colors.darkBurgundy} 100%)`, color: "#fff", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", transition: "all 0.3s" }}>{isEditing ? "Modifier" : "Ajouter"}</button>
+                <button type="button" onClick={() => {
                   setShowModal(false);
-                  resetForm();
-                }}
-                style={{
-                  background: "none",
-                  border: "none",
-                  fontSize: "24px",
-                  cursor: "pointer",
-                  color: colors.lightGray
-                }}
-              >
-                ×
-              </button>
-            </div>
-            <form onSubmit={handleSubmit} style={{ display: "grid", gap: "20px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <label style={{ color: colors.darkGray, marginBottom: "5px", fontSize: "14px", fontWeight: "500" }}>Nom *</label>
-                  <input
-                    type="text"
-                    placeholder="Nom"
-                    name="nom"
-                    value={form.nom}
-                    onChange={handleChange}
-                    required
-                    style={{ 
-                      padding: "10px 12px", 
-                      border: `2px solid ${colors.lightBlue}`, 
-                      borderRadius: "8px", 
-                      fontSize: "14px", 
-                      fontFamily: "inherit" 
-                    }}
-                  />
-                </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <label style={{ color: colors.darkGray, marginBottom: "5px", fontSize: "14px", fontWeight: "500" }}>Prénom *</label>
-                  <input
-                    type="text"
-                    placeholder="Prénom"
-                    name="prenom"
-                    value={form.prenom}
-                    onChange={handleChange}
-                    required
-                    style={{ 
-                      padding: "10px 12px", 
-                      border: `2px solid ${colors.lightBlue}`, 
-                      borderRadius: "8px", 
-                      fontSize: "14px", 
-                      fontFamily: "inherit" 
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <label style={{ color: colors.darkGray, marginBottom: "5px", fontSize: "14px", fontWeight: "500" }}>Email</label>
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    style={{ 
-                      padding: "10px 12px", 
-                      border: `2px solid ${colors.lightBlue}`, 
-                      borderRadius: "8px", 
-                      fontSize: "14px", 
-                      fontFamily: "inherit" 
-                    }}
-                  />
-                </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <label style={{ color: colors.darkGray, marginBottom: "5px", fontSize: "14px", fontWeight: "500" }}>Téléphone *</label>
-                  <input
-                    type="tel"
-                    placeholder="Téléphone"
-                    name="telephone"
-                    value={form.telephone}
-                    onChange={handleChange}
-                    required
-                    style={{ 
-                      padding: "10px 12px", 
-                      border: `2px solid ${colors.lightBlue}`, 
-                      borderRadius: "8px", 
-                      fontSize: "14px", 
-                      fontFamily: "inherit" 
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <label style={{ color: colors.darkGray, marginBottom: "5px", fontSize: "14px", fontWeight: "500" }}>Date de naissance</label>
-                  <input
-                    type="date"
-                    name="date_naissance"
-                    value={form.date_naissance}
-                    onChange={handleChange}
-                    style={{ 
-                      padding: "10px 12px", 
-                      border: `2px solid ${colors.lightBlue}`, 
-                      borderRadius: "8px", 
-                      fontSize: "14px", 
-                      fontFamily: "inherit" 
-                    }}
-                  />
-                </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <label style={{ color: colors.darkGray, marginBottom: "5px", fontSize: "14px", fontWeight: "500" }}>Date d'embauche</label>
-                  <input
-                    type="date"
-                    name="date_embauche"
-                    value={form.date_embauche}
-                    onChange={handleChange}
-                    style={{ 
-                      padding: "10px 12px", 
-                      border: `2px solid ${colors.lightBlue}`, 
-                      borderRadius: "8px", 
-                      fontSize: "14px", 
-                      fontFamily: "inherit" 
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <label style={{ color: colors.darkGray, marginBottom: "5px", fontSize: "14px", fontWeight: "500" }}>Numéro de permis</label>
-                  <input
-                    type="text"
-                    placeholder="Numéro de permis"
-                    name="numero_permis"
-                    value={form.numero_permis}
-                    onChange={handleChange}
-                    style={{ 
-                      padding: "10px 12px", 
-                      border: `2px solid ${colors.lightBlue}`, 
-                      borderRadius: "8px", 
-                      fontSize: "14px", 
-                      fontFamily: "inherit" 
-                    }}
-                  />
-                </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <label style={{ color: colors.darkGray, marginBottom: "5px", fontSize: "14px", fontWeight: "500" }}>Ville</label>
-                  <input
-                    type="text"
-                    placeholder="Ville"
-                    name="ville"
-                    value={form.ville}
-                    onChange={handleChange}
-                    style={{ 
-                      padding: "10px 12px", 
-                      border: `2px solid ${colors.lightBlue}`, 
-                      borderRadius: "8px", 
-                      fontSize: "14px", 
-                      fontFamily: "inherit" 
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <label style={{ color: colors.darkGray, marginBottom: "5px", fontSize: "14px", fontWeight: "500" }}>Code postal</label>
-                  <input
-                    type="text"
-                    placeholder="Code postal"
-                    name="code_postal"
-                    value={form.code_postal}
-                    onChange={handleChange}
-                    style={{ 
-                      padding: "10px 12px", 
-                      border: `2px solid ${colors.lightBlue}`, 
-                      borderRadius: "8px", 
-                      fontSize: "14px", 
-                      fontFamily: "inherit" 
-                    }}
-                  />
-                </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <label style={{ color: colors.darkGray, marginBottom: "5px", fontSize: "14px", fontWeight: "500" }}>Adresse</label>
-                  <textarea
-                    placeholder="Adresse"
-                    name="adresse"
-                    value={form.adresse}
-                    onChange={handleChange}
-                    rows="2"
-                    style={{
-                      padding: "10px 12px",
-                      border: `2px solid ${colors.lightBlue}`,
-                      borderRadius: "8px",
-                      fontSize: "14px",
-                      fontFamily: "inherit",
-                      resize: "vertical"
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: "10px",
-                marginTop: "20px"
-              }}>
-                <button
-                  type="submit"
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    backgroundColor: colors.black,
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "8px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    transition: "all 0.3s"
-                  }}
-                >
-                  {isEditing ? "Modifier" : "Ajouter"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowModal(false);
-                    resetForm();
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    background: colors.grayTaupe,
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "8px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    transition: "all 0.3s"
-                  }}
-                >
-                  Annuler
-                </button>
+                  setIsEditing(false);
+                  setEditingId(null);
+                  setForm({ nom: "", prenom: "", email: "", telephone: "", password: "", etat: "actif" });
+                }} style={{ flex: 1, padding: "10px", background: colors.grayTaupe, color: "#fff", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", transition: "all 0.3s" }}>Annuler</button>
               </div>
             </form>
           </div>

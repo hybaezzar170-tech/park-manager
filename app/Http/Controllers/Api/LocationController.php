@@ -26,6 +26,16 @@ class LocationController extends Controller
                 'etat' => 'nullable|in:en_cours,terminee,annulee'
             ]);
 
+            // S'assurer que les dates sont valides
+            $dateLocation = \Carbon\Carbon::parse($validated['date_location']);
+            $dateFin = \Carbon\Carbon::parse($validated['date_fin']);
+            
+            if ($dateFin->lt($dateLocation)) {
+                return response()->json([
+                    'error' => 'La date de fin doit être supérieure ou égale à la date de location'
+                ], 400);
+            }
+
             $voiture = Voiture::findOrFail($validated['voiture_id']);
 
             if ($voiture->etat === 'en_location') {
@@ -43,6 +53,75 @@ class LocationController extends Controller
             \Log::error('Location creation error: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // 🔹 Créer plusieurs locations en une seule fois
+    public function bulkStore(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'locations' => 'required|array|min:1',
+                'locations.*.voiture_id' => 'required|exists:voitures,id',
+                'locations.*.client' => 'required|string',
+                'locations.*.date_location' => 'required|date',
+                'locations.*.date_fin' => 'required|date|after_or_equal:locations.*.date_location',
+                'locations.*.prix_location' => 'required|numeric',
+                'locations.*.etat' => 'nullable|in:en_cours,terminee,annulee'
+            ]);
+
+            $createdLocations = [];
+            $errors = [];
+
+            foreach ($validated['locations'] as $index => $locationData) {
+                try {
+                    // Vérifier que les dates sont valides
+                    $dateLocation = \Carbon\Carbon::parse($locationData['date_location']);
+                    $dateFin = \Carbon\Carbon::parse($locationData['date_fin']);
+                    
+                    if ($dateFin->lt($dateLocation)) {
+                        $errors[] = "Location " . ($index + 1) . ": La date de fin doit être supérieure ou égale à la date de location";
+                        continue;
+                    }
+
+                    $voiture = Voiture::findOrFail($locationData['voiture_id']);
+
+                    if ($voiture->etat === 'en_location') {
+                        $errors[] = "Location " . ($index + 1) . ": Voiture " . $voiture->matricule . " déjà en location";
+                        continue;
+                    }
+
+                    $location = Location::create($locationData);
+
+                    // Mettre à jour l'état de la voiture
+                    $voiture->etat = 'en_location';
+                    $voiture->save();
+
+                    $createdLocations[] = $location;
+                } catch (\Exception $e) {
+                    $errors[] = "Location " . ($index + 1) . ": " . $e->getMessage();
+                }
+            }
+
+            if (!empty($errors)) {
+                return response()->json([
+                    'message' => 'Certaines locations n\'ont pas pu être créées',
+                    'created' => $createdLocations,
+                    'errors' => $errors
+                ], 207); // Multi-Status
+            }
+
+            return response()->json([
+                'message' => count($createdLocations) . ' location(s) créée(s) avec succès',
+                'data' => $createdLocations
+            ], 201);
+
+        } catch (\Exception $e) {
+            \Log::error('Bulk location creation error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Erreur lors de la création des locations',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

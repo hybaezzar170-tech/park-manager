@@ -20,7 +20,9 @@ class Conducteur extends Model
         'ville',
         'code_postal',
         'telephone',
-        'email'
+        'email',
+        'password',
+        'etat'
     ];
 
     public function voitures()

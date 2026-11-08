@@ -24,7 +24,7 @@ function UserReclamation({ user, onLogout, onClose }) {
   useEffect(() => {
     const fetchVoitures = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/voitures", {
+        const response = await fetch("http://localhost:8000/api/voitures", {
           headers: getAuthHeaders()
         });
         
@@ -92,7 +92,7 @@ function UserReclamation({ user, onLogout, onClose }) {
       };
 
       console.log('Payload validé:', payload);
-      const response = await fetch('http://127.0.0.1:8000/api/reclamations', {
+      const response = await fetch('http://localhost:8000/api/reclamations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

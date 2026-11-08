@@ -143,7 +143,7 @@ function Reparations() {
 
   const fetchReparations = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/reparations");
+      const response = await fetch("http://localhost:8000/api/reparations");
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -158,7 +158,7 @@ function Reparations() {
 
   const fetchVoitures = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/voitures");
+      const response = await fetch("http://localhost:8000/api/voitures");
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -186,7 +186,7 @@ function Reparations() {
 
   const fetchPieces = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/pieces");
+      const response = await fetch("http://localhost:8000/api/pieces");
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -204,7 +204,7 @@ function Reparations() {
 
   const fetchMecaniciens = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/ouvriers");
+      const response = await fetch("http://localhost:8000/api/ouvriers");
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -237,8 +237,8 @@ function Reparations() {
     e.preventDefault();
     const method = isEditing ? "PUT" : "POST";
     const url = isEditing 
-      ? `http://127.0.0.1:8000/api/reparations/${editingId}`
-      : "http://127.0.0.1:8000/api/reparations";
+      ? `http://localhost:8000/api/reparations/${editingId}`
+      : "http://localhost:8000/api/reparations";
 
     fetch(url, {
       method,
@@ -304,7 +304,7 @@ function Reparations() {
   const handleDelete = id => {
     if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette réparation ?")) return;
 
-    fetch(`http://127.0.0.1:8000/api/reparations/${id}`, {
+    fetch(`http://localhost:8000/api/reparations/${id}`, {
       method: "DELETE",
       headers: { Accept: "application/json" },
     })

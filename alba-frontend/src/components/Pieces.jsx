@@ -95,7 +95,7 @@ const Pieces = () => {
     nom:'',modele:'',quantite:'',prix_achat:'',fournisseur_id:'',type_piece:'',description:'',notes:''});
   const fetchPieces = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/pieces");
+      const response = await fetch("http://localhost:8000/api/pieces");
       const data = await response.json();
       console.log("Pieces data:", data);
       console.log("Pieces data type:", typeof data);
@@ -127,12 +127,12 @@ const Pieces = () => {
   };
   const fetchFournisseurs = async () => {
     try {
-      let response = await fetch("http://127.0.0.1:8000/api/fournisseurs/pieces-suppliers");
+      let response = await fetch("http://localhost:8000/api/fournisseurs/pieces-suppliers");
       let data = await response.json();
       console.log("Fournisseurs pièces raw:", data);
             if (!response.ok || (Array.isArray(data) ? data.length === 0 : (!data.data || data.data.length === 0))) {
         console.log("Essai avec l'endpoint général des fournisseurs...");
-        response = await fetch("http://127.0.0.1:8000/api/fournisseurs");
+        response = await fetch("http://localhost:8000/api/fournisseurs");
         data = await response.json();
         console.log("Fournisseurs généraux raw:", data);
                 const allFournisseurs = Array.isArray(data) ? data : (data.data || []);
@@ -163,9 +163,7 @@ const Pieces = () => {
     e.preventDefault();
     console.log("Form data submitted:", formData);
     try {
-      const url = editingPiece 
-        ? `http://127.0.0.1:8000/api/pieces/${editingPiece.id}`
-        : "http://127.0.0.1:8000/api/pieces";
+      const url = editingPiece ? `http://localhost:8000/api/pieces/${editingPiece.id}` : "http://localhost:8000/api/pieces";
       const method = editingPiece ? 'PUT' : 'POST';
       console.log(`Making ${method} request to:`, url);
       console.log("Request body:", JSON.stringify(formData, null, 2));
@@ -225,7 +223,7 @@ const Pieces = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer cette pièce?")) {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/pieces/${id}`, {
+        const response = await fetch(`http://localhost:8000/api/pieces/${id}`, {
           method: 'DELETE'
         });
 

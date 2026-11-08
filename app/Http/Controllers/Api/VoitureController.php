@@ -52,7 +52,6 @@ class VoitureController extends Controller
                 'matricule' => 'required|string|unique:voitures',
                 'modele' => 'required|string',
                 'num_serie' => 'required|string|unique:voitures,num_serie',
-                'type_departement' => 'required|string',
                 'departement_id' => 'required|exists:departements,id',
                 'conducteur_id' => 'nullable|exists:conducteurs,id',
                 'marque' => 'required|string',
@@ -93,6 +92,39 @@ class VoitureController extends Controller
         return response()->json($voiture, 200);
     }
 
+    // 🔹 Afficher détails complets de la voiture avec toutes les relations
+    public function details($id)
+    {
+        try {
+            $voiture = Voiture::with([
+                'departement', 
+                'conducteur', 
+                'fournisseur'
+            ])->find($id);
+
+            if (!$voiture) {
+                return response()->json(['message' => 'Voiture introuvable'], 404);
+            }
+
+            // Récupérer les relations séparément pour éviter les erreurs
+            $voiture->locations = $voiture->locations()->get();
+            $voiture->ventes = $voiture->ventes()->get();
+            $voiture->maintenances = $voiture->maintenances()->get();
+            $voiture->reparations = $voiture->reparations()->get();
+            $voiture->assurance = $voiture->assurance()->with('fournisseur')->first();
+            $voiture->visite = $voiture->visite()->first();
+            $voiture->taxecirculation = $voiture->taxecirculation()->first();
+
+            return response()->json($voiture, 200);
+        } catch (\Exception $e) {
+            \Log::error('Voiture details error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Erreur lors de la récupération des détails: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     // 🔹 Modifier voiture
     public function update(Request $request, $id)
     {
@@ -106,7 +138,6 @@ class VoitureController extends Controller
             'matricule' => 'sometimes|required|string|unique:voitures,matricule,' . $id,
             'modele' => 'sometimes|required|string',
             'num_serie' => 'sometimes|required|string|unique:voitures,num_serie,' . $id,
-            'type_departement' => 'sometimes|required|string',
             'departement_id' => 'sometimes|required|exists:departements,id',
             'conducteur_id' => 'nullable|exists:conducteurs,id',
             'marque' => 'sometimes|required|string',

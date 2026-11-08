@@ -3,7 +3,7 @@ import GestionDepartement from "./GestionDepartement";
 import GestionConducteur from "./GestionConducteur";
 import GestionVoitures from "./GestionVoitures";
 import TransactionVoiture from "./TransactionVoiture";
-import Asvita from "./Asvita"; 
+import Asvita from "./Asvita";
 import logo from "../assets/whitelogo.png";
 
 function Dashboard({ user, onLogout, onClose }) {
@@ -46,7 +46,7 @@ function Dashboard({ user, onLogout, onClose }) {
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/statistics", {
+        const response = await fetch("http://localhost:8000/api/statistics", {
           headers: getAuthHeaders()
         });
         
@@ -171,9 +171,9 @@ function Dashboard({ user, onLogout, onClose }) {
           Voiture
         </button>
         <button style={{...sidebarButtonStyle(selectedModule === "transaction")}} onClick={() => setSelectedModule("transaction")}>
-          Contrat </button>
+          Contrats </button>
         <button style={{...sidebarButtonStyle(selectedModule === "asvita")}} onClick={() => setSelectedModule("asvita")}>
-          Assurance / Visite / Taxe
+Documents des voitures
         </button>
         
         <div style={{ marginTop: "20px" }}></div>
@@ -235,8 +235,7 @@ function Dashboard({ user, onLogout, onClose }) {
               marginBottom: "30px",
               letterSpacing: "-0.5px"
             }}>
-              Gestion des Voitures
-            </h1>
+Voitures             </h1>
             
             <div style={{
               display: "grid",
@@ -269,11 +268,7 @@ function Dashboard({ user, onLogout, onClose }) {
                 value={statistics.voitures_vendues_count}
                 color={colors.grayTaupe}
               />
-              <StatBox
-                title="Maintenances actives"
-                value={statistics.active_maintenances_count}
-                color="#FF6B35"
-              />
+  
              
             </div>
           </div>
