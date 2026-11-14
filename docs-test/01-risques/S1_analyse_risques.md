@@ -76,3 +76,4 @@ Priorité : **6 à 9 = élevée**, **3 à 4 = moyenne**, **1 à 2 = faible**. Le
 ## 5. Synthèse
 
 Les captures confirment que les risques les plus élevés se concentrent sur les **contrats** (double vente, montants aberrants), les **alertes** (doublons, véhicule vendu toujours concerné) et la **qualité des données saisies** (doublons, formats). Les tests des semaines 4 à 9 sont orientés d'abord vers ces domaines.
+

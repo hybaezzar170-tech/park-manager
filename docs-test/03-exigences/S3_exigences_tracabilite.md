@@ -103,6 +103,8 @@ Priorité : **H** = risque de niveau 6 à 9, **M** = 3 à 4, **B** = 1 à 2 (voi
 | A8 | Suppression d'un ouvrier lié à une réparation | EX-OUV-03 | Refusée, ou historique conservé |
 | A9 | Un coût de réparation à 0 DT est-il valide ? | EX-REP-03 | Valide seulement s'il est justifié |
 | A10 | La protection CSRF concerne-t-elle une API à jeton ? | ENF-SEC-03 | Hors périmètre si l'API utilise uniquement un jeton |
+| A11 | L'état EN LOCATION est-il pris à la validation du contrat ou à la date de début ? | EX-CTR-05 | À confirmer ; observé en semaine 5 : l'état dépend de la date de fin (EN LOCATION tant que la fin n'est pas passée) |
+| A12 | Deux assurances de même type peuvent-elles se chevaucher sur un même véhicule ? | EX-DOC-01 | À confirmer ; observé en semaine 5 : acceptées |
 
 Chaque hypothèse sera confirmée ou corrigée avant la rédaction finale des cas de test, et la mention de l'hypothèse utilisée figurera dans chaque cas concerné.
 
@@ -112,7 +114,7 @@ Les cas de test (`TC-...`) sont réservés ici et seront rédigés en semaine 4.
 
 | Exigence | Risque(s) | Niveau de test | Cas de test prévus |
 |---|---|---|---|
-| EX-VEH-01 | R8, R16 | API, interface | TC-VEH-01 |
+| EX-VEH-01 | R8, R13, R16 | API, interface | TC-VEH-01, TC-VEH-10 |
 | EX-VEH-02 | R8 | Unitaire, API | TC-VEH-02, TC-VEH-03 |
 | EX-VEH-03 | R17 | API | TC-VEH-04 |
 | EX-VEH-04 | R9 | Intégration, API | TC-VEH-05, TC-VEH-06 |

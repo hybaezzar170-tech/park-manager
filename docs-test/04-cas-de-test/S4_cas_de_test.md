@@ -1,25 +1,3 @@
-# Catalogue des cas de test et jeux de données : Park Manager
-
-| Élément | Valeur |
-|---|---|
-| Version | 1.1 |
-| Date | 10/11/2026 |
-| Auteure | Hyba Ezzar |
-| Documents liés | `01-risques/S1_analyse_risques.md`, `02-plan/S2_plan_de_test.md`, `03-exigences/S3_exigences_tracabilite.md` |
-
-## 1. Objet et conventions
-
-Ce document contient **20 cas de test retenus** pour la campagne, choisis parmi 29 cas conçus à partir des exigences de la semaine 3. La sélection suit le risque : tous les risques de niveau 6 à 9 sont couverts, et les cas redondants sont placés dans une liste de cas complémentaires (section 5).
-
-Les cas sont **conçus, pas encore exécutés**. Les résultats seront consignés dans les rapports d'exécution et le registre des anomalies (semaines 5 à 9).
-
-| Convention | Signification |
-|---|---|
-| Identifiant | `TC-<MODULE>-<NN>`, identique à ceux réservés dans la matrice de traçabilité |
-| Type | **P** = positif (cas nominal), **N** = négatif (cas d'erreur), **L** = valeur limite |
-| Technique | **PE** = partition d'équivalence, **VL** = valeur limite, **TD** = table de décision, **ET** = transition d'état, **EX** = exploratoire |
-| Mention (A3), (A4)... | Hypothèse de la section 3 du document des exigences, utilisée pour le résultat attendu |
-| Résultat observé | Non renseigné ici : il figure dans le rapport d'exécution |
 
 ## 2. Application des techniques de conception
 
@@ -172,13 +150,3 @@ Ces cas ont été conçus puis écartés, car ils répètent un cas retenu ou po
 | Cas liés à une exigence de priorité H | 16 |
 | Risques de niveau 6 à 9 couverts | R1, R2, R3, R4, R5, R6, R8, R9, R10, R11, R14 : **11 sur 11** |
 | Risque de niveau inférieur couvert | R7 (TC-NF-01) |
-
-### Lien avec les semaines suivantes
-
-| Semaine | Cas exécutés |
-|---|---|
-| 5 | Exécution manuelle : TC-VEH-01 à 08, TC-CTR-01, 02, 03, 06, TC-ALR-01, 04, TC-DOC-03 |
-| 6 | Automatisation unitaire à partir de TC-CTR-03, TC-REP-02, TC-STK-03, TC-VEH-02, TC-ALR-01 |
-| 7 | Automatisation d'intégration à partir de TC-STK-02, TC-OUV-03, TC-VEH-07 |
-| 8 | Collection Postman : TC-SEC-03, TC-SEC-04, TC-VEH-07, TC-CTR-03 |
-| 9 | Parcours d'interface (TC-VEH-01, TC-CTR-06) et test non fonctionnel TC-NF-01 |

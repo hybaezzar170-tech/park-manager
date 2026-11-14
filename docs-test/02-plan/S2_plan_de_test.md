@@ -20,7 +20,7 @@ Le sujet fournit des règles pour RéclaGest. Elles sont adaptées à Park Manag
 |ID|Règle (à confirmer en semaine 3)|Origine|
 |-|-|-|
 |RG1|Un véhicule a un matricule unique et obligatoire|Adaptation de « titre obligatoire »|
-|RG2|Statuts d'un véhicule : DISPONIBLE, EN LOCATION, VENDU|Observé dans l'application|
+|RG2|Statuts d'un véhicule : DISPONIBLE, EN LOCATION, EN MAINTENANCE, VENDU|Observé dans l'application ; EN MAINTENANCE ajouté en semaine 5|
 |RG3|Un véhicule vendu ne peut plus être vendu, loué ou affecté|Adaptation de « clôturée non modifiable »|
 |RG4|Un contrat est associé à un véhicule et à un client|Rapport, chapitre 2|
 |RG5|Les montants (prix, coût) sont strictement positifs et plausibles|Hypothèse issue de R2 et R10|
@@ -194,15 +194,19 @@ Ces seuils sont figés avant l'exécution de la campagne finale et ne sont modif
 |Capture|`S<semaine>\_<NN>\_<sujet>.png`|`S6\_02\_phpunit\_resultats.png`|
 |Commit|`Semaine N - contenu`|`Semaine 2 - plan de test`|
 
+Une capture qui regroupe plusieurs écrans est enregistrée en plusieurs images, suffixées `_a`, `_b`, `_c` (exemple : `S5_10_maintenance_terminee_a.png`).
+
 Structure du dépôt :
 
 ```
 docs-test/
-├── 01-risques/
+├── 01-risques/           fiche projet, analyse des risques
 ├── 02-plan/              ce document
-├── 03-cas-de-test/
-├── 04-anomalies/
-└── captures/
+├── 03-exigences/         exigences, critères d'acceptation, matrice de traçabilité
+├── 04-cas-de-test/       cas de test, jeux de données
+├── 04-anomalies/         fiches et registre des anomalies
+├── 05-transitions/       transitions d'état et tests exploratoires
+└── captures/             preuves
 ```
 
 Les scripts automatisés se placent dans les dossiers standards du projet : `tests/` pour PHPUnit, `docs-test/postman/` pour Postman, `e2e/` pour Playwright.
