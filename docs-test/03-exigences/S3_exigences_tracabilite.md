@@ -93,7 +93,7 @@ Priorité : **H** = risque de niveau 6 à 9, **M** = 3 à 4, **B** = 1 à 2 (voi
 
 | N° | Ambiguïté | Exigence concernée | Hypothèse retenue |
 |---|---|---|---|
-| A1 | Combien de jours avant l'expiration l'alerte est-elle générée ? | EX-ALR-01 | 30 jours, à confirmer par observation |
+| A1 | Combien de jours avant l'expiration l'alerte est-elle générée ? | EX-ALR-01 | **Corrigé en semaine 6** : le code déclenche l'alerte à 3 jours (Warning) et à 1 jour (Urgent). Durée à valider avec l'encadrant |
 | A2 | Format du matricule et unicité | EX-VEH-02 | Obligatoire et unique, format libre |
 | A3 | Un véhicule vendu peut-il être revendu ou loué ? | EX-VEH-05 | Non : une double vente est un défaut |
 | A4 | Plage de prix acceptée pour une vente ou un achat | EX-CTR-03 | Strictement positif, sans maximum précis |

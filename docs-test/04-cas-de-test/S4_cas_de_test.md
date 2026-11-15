@@ -1,3 +1,25 @@
+# Catalogue des cas de test et jeux de données : Park Manager
+
+| Élément | Valeur |
+|---|---|
+| Version | 1.3 |
+| Date | 14/11/2026 |
+| Auteure | Hyba Ezzar |
+| Documents liés | `01-risques/S1_analyse_risques.md`, `02-plan/S2_plan_de_test.md`, `03-exigences/S3_exigences_tracabilite.md` |
+
+## 1. Objet et conventions
+
+Ce document contient **21 cas de test retenus** pour la campagne, choisis parmi 30 cas conçus à partir des exigences de la semaine 3. La sélection suit le risque : tous les risques de niveau 6 à 9 sont couverts, et les cas redondants sont placés dans une liste de cas complémentaires (section 5).
+
+Les cas sont **conçus**. Les premiers résultats d'exécution (semaine 5) figurent dans `05-transitions/S5_transitions.md` (section 8) et dans le registre des anomalies. Les autres résultats seront consignés aux semaines 6 à 9. Le cas TC-VEH-10 a été ajouté après la session exploratoire de la semaine 5. Les cas TC-ALR-01 et TC-STK-03 ont été ajustés en semaine 6 (voir `06-tests-unitaires/S6_tests_unitaires.md`, section 7).
+
+| Convention | Signification |
+|---|---|
+| Identifiant | `TC-<MODULE>-<NN>`, identique à ceux réservés dans la matrice de traçabilité |
+| Type | **P** = positif (cas nominal), **N** = négatif (cas d'erreur), **L** = valeur limite |
+| Technique | **PE** = partition d'équivalence, **VL** = valeur limite, **TD** = table de décision, **ET** = transition d'état, **EX** = exploratoire |
+| Mention (A3), (A4)... | Hypothèse de la section 3 du document des exigences, utilisée pour le résultat attendu |
+| Résultat observé | Non renseigné ici : il figure dans le rapport d'exécution |
 
 ## 2. Application des techniques de conception
 
@@ -17,8 +39,8 @@
 | Donnée | Valeurs testées | Cas | Hypothèse |
 |---|---|---|---|
 | Prix de vente | `0` et `-1` | TC-CTR-03 | Positif strict (A4) |
-| Délai de l'alerte (N = 30 jours) | `N+1`, `N`, `N-1` | TC-ALR-01 | N = 30 (A1) |
-| Stock d'une pièce | Utilisation de 1 (stock 25), puis de 2 (stock 1) | TC-STK-02, TC-STK-03 | Stock jamais négatif |
+| Délai de l'alerte (N = 3 jours) | `N+1`, `N`, `N-1` | TC-ALR-01 | N = 3 (A1 corrigée en semaine 6) |
+| Stock d'une pièce | Utilisation de 1 (stock 25), puis de 1 (stock 0) | TC-STK-02, TC-STK-03 | Stock jamais négatif |
 | Dates d'une réparation | Fin = début − 1 jour | TC-REP-02 | Fin ≥ début |
 
 Les autres valeurs (prix `10000000`, alerte à J0 et J-1, coût de réparation nul) sont reportées dans les cas complémentaires.
@@ -58,10 +80,10 @@ Toutes les données de test portent le préfixe `TEST` pour les distinguer des d
 | Code | Contenu | Utilisé par |
 |---|---|---|
 | DS-P1 | Pièce `TEST Filtre à huile`, stock 25, prix 12,50 | TC-STK-02 |
-| DS-P2 | Pièce `TEST Bougie`, stock 1 | TC-STK-03 |
-| DS-D1 | Assurance de DS-V1 expirant dans 31 jours | TC-ALR-01 |
-| DS-D2 | Assurance de DS-V1 expirant dans 30 jours | TC-ALR-01 |
-| DS-D3 | Assurance de DS-V1 expirant dans 29 jours | TC-ALR-01 |
+| DS-P2 | Pièce `TEST Bougie`, stock 0 | TC-STK-03 |
+| DS-D1 | Assurance de DS-V1 expirant dans 4 jours | TC-ALR-01 |
+| DS-D2 | Assurance de DS-V1 expirant dans 3 jours | TC-ALR-01 |
+| DS-D3 | Assurance de DS-V1 expirant dans 2 jours | TC-ALR-01 |
 | DS-D5 | Document de DS-V1 avec une date d'expiration passée (hier) | TC-DOC-03 |
 | DS-D6 | Assurance de DS-V2 (véhicule vendu) expirant dans 10 jours | TC-ALR-04 |
 
@@ -76,18 +98,19 @@ DS-V3 (Hyundai Tucson, EN LOCATION), DS-C1 (conducteur actif), DS-O2 (ouvrier av
 | DS-S2 | Compte d'un rôle non administrateur (si le rôle existe, A7) | TC-SEC-04 |
 | DS-S3 | Chaînes d'attaque : `' OR 1=1 --` et `<script>alert(1)</script>` | TC-NF-01 |
 
-## 4. Catalogue des 20 cas de test retenus
+## 4. Catalogue des 21 cas de test retenus
 
-### 4.1 Véhicules et conducteurs (6 cas)
+### 4.1 Véhicules et conducteurs (7 cas)
 
 | ID | Cas de test | Type | Tech. | Données | Étapes | Résultat attendu | Trace |
 |---|---|---|---|---|---|---|---|
-| TC-VEH-01 | Ajouter un véhicule valide | P | PE | DS-V1 | Se connecter, ouvrir Voiture, remplir le formulaire, valider | Le véhicule apparaît dans le catalogue avec les valeurs saisies | EX-VEH-01 / R8 |
+| TC-VEH-01 | Ajouter un véhicule valide | P | PE | DS-V1 | Se connecter, ouvrir Contrats > ACHAT, remplir le formulaire Achat Voiture, valider | Le véhicule apparaît dans le catalogue avec les valeurs saisies | EX-VEH-01 / R8 |
 | TC-VEH-02 | Ajouter un véhicule sans matricule | N | PE | Matricule vide | Remplir le formulaire sans matricule, valider | Refus avec message d'erreur ; aucun véhicule créé (A2) | EX-VEH-02 / R8 |
 | TC-VEH-03 | Ajouter un véhicule avec un matricule déjà utilisé | N | PE | `90001-T-01` après TC-VEH-01 | Ajouter un second véhicule avec le même matricule | Refus ; un seul véhicule porte ce matricule (A2) | EX-VEH-02 / R8 |
 | TC-VEH-06 | Affecter un conducteur inactif | N | PE | DS-V1, DS-C2 | Affecter le conducteur inactif au véhicule | Refus avec message ; aucune affectation créée | EX-CON-02 / R9 |
 | TC-VEH-07 | Revendre un véhicule déjà vendu | N | TD, ET | DS-V2, DS-CL1 | Créer une vente sur DS-V2 | Refus ; une seule vente reste enregistrée (A3) | EX-VEH-05 / R1 |
 | TC-VEH-08 | Louer un véhicule vendu | N | TD, ET | DS-V2, DS-CL1 | Créer une location sur DS-V2 | Refus ; statut inchangé (A3) | EX-VEH-05 / R1 |
+| TC-VEH-10 | Désactiver un véhicule | P | EX | Voiture DISPONIBLE du catalogue | Ouvrir Voiture, cliquer sur Désactiver sur la ligne du véhicule | Le véhicule est désactivé et un message de confirmation s'affiche | EX-VEH-01 / R13 |
 
 ### 4.2 Contrats (4 cas)
 
@@ -103,7 +126,7 @@ DS-V3 (Hyundai Tucson, EN LOCATION), DS-C1 (conducteur actif), DS-O2 (ouvrier av
 | ID | Cas de test | Type | Tech. | Données | Étapes | Résultat attendu | Trace |
 |---|---|---|---|---|---|---|---|
 | TC-DOC-03 | Enregistrer un document avec une date d'expiration passée | N | PE | DS-V1, DS-D5 | Ouvrir Documents, saisir une date d'expiration d'hier, valider | Refus ou avertissement ; le document n'est pas enregistré silencieusement (hypothèse EX-DOC-03) | EX-DOC-03 / R14 |
-| TC-ALR-01 | Alerte à l'approche de l'échéance | L | VL | DS-D1, DS-D2, DS-D3 | Ouvrir Alertes après chaque ajout de document | Aucune alerte à 31 jours ; alerte à 30 et 29 jours avec le temps restant correct (A1) | EX-ALR-01 / R3 |
+| TC-ALR-01 | Alerte à l'approche de l'échéance | L | VL | DS-D1, DS-D2, DS-D3 | Ouvrir Alertes après chaque ajout de document | Aucune alerte à 4 jours ; alerte à 3 et à 2 jours avec le temps restant correct (A1) | EX-ALR-01 / R3 |
 | TC-ALR-04 | Pas d'alerte pour un véhicule vendu | N | TD | DS-D6 (véhicule VENDUE) | Ouvrir Alertes | Aucune alerte pour DS-V2 (A5) | EX-ALR-03 / R3 |
 
 ### 4.4 Réparations, stock et ouvriers (4 cas)
@@ -112,7 +135,7 @@ DS-V3 (Hyundai Tucson, EN LOCATION), DS-C1 (conducteur actif), DS-O2 (ouvrier av
 |---|---|---|---|---|---|---|---|
 | TC-REP-02 | Réparation avec fin avant début | N | VL | DS-V4, DS-O1, début `10/12/2026`, fin `09/12/2026` | Remplir et valider le formulaire de réparation | Refus avec message | EX-REP-02 / R10 |
 | TC-STK-02 | La réparation décrémente le stock | P | PE | DS-P1 (stock 25), DS-V4, DS-O1 | Valider une réparation utilisant 1 filtre | Stock de DS-P1 égal à 24 | EX-STK-02 / R4 |
-| TC-STK-03 | Réparation avec stock insuffisant | L | VL | DS-P2 (stock 1), utilisation de 2 | Valider une réparation utilisant 2 bougies | Refus ; stock reste à 1 et jamais négatif | EX-STK-03 / R4 |
+| TC-STK-03 | Réparation avec une pièce sans stock | L | VL | DS-P2 (stock 0), utilisation de 1 | Valider une réparation utilisant 1 bougie | Refus, ou pièce non rattachée ; stock jamais négatif | EX-STK-03 / R4 |
 | TC-OUV-03 | Supprimer un ouvrier lié à une réparation | N | EX | DS-O1 lié à une réparation | Cliquer Supprimer | Refus, ou historique conservé sans erreur d'affichage (A8) | EX-OUV-03 / R11 |
 
 ### 4.5 Sécurité et accès (3 cas)
@@ -144,9 +167,19 @@ Ces cas ont été conçus puis écartés, car ils répètent un cas retenu ou po
 
 | Indicateur | Valeur |
 |---|---|
-| Cas de test conçus | 29 |
-| Cas retenus pour la campagne | **20** |
-| Cas positifs, négatifs, limites (retenus) | 4 P, 13 N, 3 L |
-| Cas liés à une exigence de priorité H | 16 |
+| Cas de test conçus | 30 |
+| Cas retenus pour la campagne | **21** |
+| Cas positifs, négatifs, limites (retenus) | 5 P, 13 N, 3 L |
+| Cas liés à une exigence de priorité H | 17 |
 | Risques de niveau 6 à 9 couverts | R1, R2, R3, R4, R5, R6, R8, R9, R10, R11, R14 : **11 sur 11** |
-| Risque de niveau inférieur couvert | R7 (TC-NF-01) |
+| Risques de niveau inférieur couverts | R7 (TC-NF-01), R13 (TC-VEH-10) |
+
+### Lien avec les semaines suivantes
+
+| Semaine | Cas exécutés |
+|---|---|
+| 5 | Exécution manuelle : TC-VEH-01 à 08 et 10, TC-CTR-01, 02, 03, 06, TC-ALR-01, 04, TC-DOC-03 (état d'avancement : `S5_transitions.md`, section 8) |
+| 6 | Automatisation unitaire à partir de TC-CTR-03, TC-REP-02, TC-STK-03, TC-VEH-02, TC-ALR-01 |
+| 7 | Automatisation d'intégration à partir de TC-STK-02, TC-OUV-03, TC-VEH-07 |
+| 8 | Collection Postman : TC-SEC-03, TC-SEC-04, TC-VEH-07, TC-CTR-03 |
+| 9 | Parcours d'interface (TC-VEH-01, TC-CTR-06) et test non fonctionnel TC-NF-01 |
