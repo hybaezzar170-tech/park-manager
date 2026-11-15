@@ -15,7 +15,7 @@ class VenteController extends Controller
     public function store(Request $request) {
         $request->validate([
             'voiture_id' => 'required|exists:voitures,id',
-            'acheteur' => 'required',
+            'client_id' => 'required|exists:clients,id',
             'prix_vente' => 'required|numeric',
             'date_vente' => 'required|date'
         ]);
