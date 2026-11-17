@@ -1,4 +1,6 @@
 # Plan de test : Park Manager
+Hyba ezzar
+Emna zaydoun
 
 ## 1\. Objectif
 

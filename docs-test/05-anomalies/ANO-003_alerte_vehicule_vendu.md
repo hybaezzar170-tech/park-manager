@@ -4,7 +4,7 @@
 |---|---|
 | Identifiant | ANO-003 |
 | Date de détection | 13/11/2026 |
-| Détectée par | Hyba Ezzar |
+| Détectée par | Hyba Ezzar,Emna zaydoun |
 | Module | Documents des voitures > Assurance ; page Alertes |
 | Cas de test lié | TC-ALR-04 (pas d'alerte pour un véhicule vendu) |
 | Exigence / risque | EX-ALR-03 / R3 ; hypothèse A5 (un véhicule vendu ne génère plus d'alerte) |

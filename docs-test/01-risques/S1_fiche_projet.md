@@ -6,7 +6,7 @@
 |---|---|
 | Module | Atelier Test et validation des logiciels, Licence 3 |
 | Établissement | ISET Mahdia |
-| Étudiante | Hyba Ezzar et emna zaydoun |
+| Étudiante | Hyba Ezzar  Emna zaydoun |
 
 ## 2. Système testé
 

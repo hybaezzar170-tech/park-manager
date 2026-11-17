@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.0 (semaine 6) |
 | Date | 14/11/2026 |
-| Auteure | Hyba Ezzar |
+| Auteure |Emna zaydoun Hyba Ezzar |
 | Documents liés | `S4_cas_de_test.md`, `S5_transitions.md`, `registre_anomalies.md`, `S2_plan_de_test.md` (sections 4 et 10) |
 
 ## 1. Objet et méthode

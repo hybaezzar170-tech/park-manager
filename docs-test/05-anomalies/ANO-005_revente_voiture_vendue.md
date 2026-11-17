@@ -4,7 +4,7 @@
 |---|---|
 | Identifiant | ANO-005 |
 | Date de détection | 14/11/2026 |
-| Détectée par | Hyba Ezzar (test automatisé UT-04) |
+| Détectée par | Hyba Ezzar,Emna zaydoun (test automatisé UT-04) |
 | Module | Contrats > Vente (`VenteController::store`) |
 | Cas de test lié | TC-VEH-07 (revendre un véhicule déjà vendu) ; transition TT-VEH-04 de la semaine 5 |
 | Exigence / risque | EX-VEH-05 / R1 ; règle RG3 ; hypothèse A3 (un véhicule vendu ne peut plus être vendu) |

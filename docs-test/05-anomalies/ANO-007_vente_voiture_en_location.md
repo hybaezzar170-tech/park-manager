@@ -4,7 +4,7 @@
 |---|---|
 | Identifiant | ANO-007 |
 | Date de détection | 15/11/2026 |
-| Détectée par | Hyba Ezzar et emna zaydoun  |
+| Détectée par | Hyba Ezzar et Emna zaydoun  |
 | Module | Contrats > Vente (`VenteController::store`) |
 | Cas de test lié | Transition TT-VEH-07 de la semaine 5 ; table de décision de `S4` (ligne EN LOCATION, vente refusée, hypothèse) |
 | Exigence / risque | R1 (vendre un véhicule déjà en location) ; règle RG3 par analogie ; l'intention du code est de refuser ce cas (message « Voiture en location ») |
@@ -62,4 +62,3 @@ Failed asserting that 201 is equal to 400 or is greater than 400.
 | Sévérité | **Critique** | Risque R1 de niveau 9 : une voiture louée peut être vendue, ce qui crée une double transaction ; règle métier essentielle violée (`S2`, section 11) |
 | Priorité | **P1** | À corriger avant la campagne finale (`S2`, section 12 : règle métier essentielle non satisfaite sans contournement serveur) |
 | Reproductibilité | 1 exécution sur 1 | Test lancé seul ; à reconfirmer par la suite complète |
-

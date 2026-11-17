@@ -4,7 +4,8 @@
 |---|---|
 | Version | 1.3 |
 | Date | 14/11/2026 |
-| Auteure | Hyba Ezzar |
+| Auteure | Hyba Ezzar
+Emna zaydoun |
 | Documents liés | `01-risques/S1_analyse_risques.md`, `02-plan/S2_plan_de_test.md`, `03-exigences/S3_exigences_tracabilite.md` |
 
 ## 1. Objet et conventions

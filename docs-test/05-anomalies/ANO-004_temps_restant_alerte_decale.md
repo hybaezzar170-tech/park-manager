@@ -4,7 +4,7 @@
 |---|---|
 | Identifiant | ANO-004 |
 | Date de détection | 13/11/2026 |
-| Détectée par | Hyba Ezzar |
+| Détectée par | Hyba Ezzar,Emna zaydoun|
 | Module | Alertes |
 | Cas de test lié | TC-ALR-01 (alerte à l'approche de l'échéance, temps restant correct) |
 | Exigence / risque | EX-ALR-01 / R3 ; hypothèse A1 (alerte à 30 jours) |

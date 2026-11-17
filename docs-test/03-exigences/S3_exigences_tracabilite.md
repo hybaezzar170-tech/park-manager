@@ -1,6 +1,7 @@
 # Exigences, critères d'acceptation et traçabilité : Park Manager
 
-
+Emna zaydoun
+Hyba Ezzar
 ## 1. Exigences fonctionnelles et critères d'acceptation
 
 Format : **Étant donné** (contexte), **quand** (action), **alors** (résultat observable).

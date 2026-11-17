@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.0 (semaine 5 terminée) |
 | Date | 13/11/2026 |
-| Auteure | Hyba Ezzar |
+| Auteure | Hyba Ezzar , Emna zaydoun |
 | Documents liés | `S3_exigences_tracabilite.md`, `S4_cas_de_test.md` |
 
 ## 1. Écarts avec le référentiel du sujet

@@ -4,7 +4,7 @@
 |---|---|
 | Identifiant | ANO-002 |
 | Date de détection | 13/11/2026 |
-| Détectée par | Hyba Ezzar et emna zaydoun |
+| Détectée par | Hyba Ezzar et Emna zaydoun |
 | Module | Voiture > Catalogue des voitures |
 | Cas de test lié | TC-VEH-10 (nouveau, issu de la session exploratoire ; à ajouter au catalogue S4) |
 | Exigence / risque | EX-VEH-01 (désactiver un véhicule) / R13 (codes HTTP et gestion des erreurs de l'API) |
