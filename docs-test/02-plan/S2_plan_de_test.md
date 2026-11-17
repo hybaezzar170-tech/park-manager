@@ -105,14 +105,9 @@ Un compte administrateur, un compte d'un autre rôle (si l'application en gère 
 |Tests d'interface|Playwright|Parcours critique, captures de trace|
 |Performance (option)|k6|Seulement si choisi en semaine 9|
 |Anomalies|GitHub Issues|Étiquettes de sévérité et de priorité|
-|Aide à la conception|Agent IA|Voir section 14|
 
-## 9\. Rôles et responsabilités
 
-|Rôle|Responsable|
-|-|-|
-|Analyse, conception, exécution, rapport|Hyba Ezzar et emna zaydoun|
-|Encadrement et revue|Enseignant du module|
+
 
 ## 10\. Critères d'entrée, de sortie, de suspension
 
