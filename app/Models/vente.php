@@ -10,7 +10,6 @@ class Vente extends Model
 
     protected $fillable = [
         'voiture_id',
-        'client_id',
         'acheteur',
         'prix_vente',
         'date_vente'
@@ -19,10 +18,5 @@ class Vente extends Model
     public function voiture()
     {
         return $this->belongsTo(Voiture::class);
-    }
-
-    public function client()
-    {
-        return $this->belongsTo(Client::class);
     }
 }

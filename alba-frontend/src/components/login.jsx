@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import bg from "../assets/car.png";
 import logo from "../assets/autopark.png";
 
@@ -37,22 +37,22 @@ function Login({ onLogin }) {
           localStorage.setItem('authToken', data.token);
         }
         
-        // Appeler onLogin avec les données utilisateur
+        // Appeler onLogin avec les donnÃ©es utilisateur
         onLogin(data.user);
       } else {
-        // Gérer les erreurs de l'API
+        // GÃ©rer les erreurs de l'API
         setError(data.message || data.error || "Email ou mot de passe incorrect");
       }
     } catch (err) {
       console.error("Erreur de connexion:", err);
-      setError("Erreur de connexion au serveur. Veuillez réessayer.");
+      setError("Erreur de connexion au serveur. Veuillez rÃ©essayer.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={styles.page}>
+    <main style={styles.page}>
       <div style={styles.overlay}></div>
       
       <div style={styles.rightSection}>
@@ -88,7 +88,7 @@ function Login({ onLogin }) {
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   value={form.password}
                   onChange={handleChange}
                   required
@@ -129,7 +129,7 @@ function Login({ onLogin }) {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -325,3 +325,4 @@ const styles = {
 };
 
 export default Login;
+
