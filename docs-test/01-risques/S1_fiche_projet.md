@@ -61,7 +61,7 @@ Le sujet propose l'application « RéclaGest ». Park Manager la remplace comme 
 | Tests d'interface | Playwright |
 | Performance | k6 |
 | Suivi des anomalies | GitHub Issues |
-|
+| Aide à la rédaction et à la génération de tests | Agent IA (voir section 5) |
 
 ## 5. Organisation du dépôt
 
@@ -71,7 +71,7 @@ docs-test/
 ├── 02-plan/             plan de test
 ├── 03-exigences/        exigences, critères d'acceptation, matrice de traçabilité
 ├── 04-cas-de-test/      cas de test, jeux de données
-├── 04-anomalies/        fiches et registre des anomalies
+├── 05-anomalies/        fiches et registre des anomalies
 ├── 05-transitions/      transitions d'état et tests exploratoires
 ├── 06-tests-unitaires/   rapport des tests unitaires, résumé de couverture
 └── captures/            preuves (S1_01_..., S5_01_..., ...)

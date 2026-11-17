@@ -8,6 +8,7 @@ La campagne est guidée par le risque : les risques de niveau 6 à 9 identifiés
 
 ## 2\. Périmètre
 
+Le périmètre est celui défini dans `S1\_analyse\_risques.md` (section 5) :
 
 * **Inclus** : authentification et rôles, départements, conducteurs, véhicules, contrats, documents, alertes, ouvriers, fournisseurs, pièces, maintenance, réparations, API REST, base de données, un test non fonctionnel.
 * **Exclu** : production et hébergement, charge lourde, envoi réel d'emails et de SMS, compatibilité multi-navigateurs, arabe complet.
@@ -104,10 +105,16 @@ Un compte administrateur, un compte d'un autre rôle (si l'application en gère 
 |Tests d'interface|Playwright|Parcours critique, captures de trace|
 |Performance (option)|k6|Seulement si choisi en semaine 9|
 |Anomalies|GitHub Issues|Étiquettes de sévérité et de priorité|
+|Aide à la conception|Agent IA|Voir section 14|
 
+## 9\. Rôles et responsabilités
 
+|Rôle|Responsable|
+|-|-|
+|Analyse, conception, exécution, rapport|Hyba Ezzar et emna zaydoun|
+|Encadrement et revue|Enseignant du module|
 
-## 9\. Critères d'entrée, de sortie, de suspension
+## 10\. Critères d'entrée, de sortie, de suspension
 
 ### Critères d'entrée (début d'une campagne d'exécution)
 
@@ -187,6 +194,23 @@ Ces seuils sont figés avant l'exécution de la campagne finale et ne sont modif
 |Capture|`S<semaine>\_<NN>\_<sujet>.png`|`S6\_02\_phpunit\_resultats.png`|
 |Commit|`Semaine N - contenu`|`Semaine 2 - plan de test`|
 
+Une capture qui regroupe plusieurs écrans est enregistrée en plusieurs images, suffixées `_a`, `_b`, `_c` (exemple : `S5_10_maintenance_terminee_a.png`).
+
+Structure du dépôt :
+
+```
+docs-test/
+├── 01-risques/           fiche projet, analyse des risques
+├── 02-plan/              ce document
+├── 03-exigences/         exigences, critères d'acceptation, matrice de traçabilité
+├── 04-cas-de-test/       cas de test, jeux de données
+├── 05-anomalies/         fiches et registre des anomalies
+├── 05-transitions/       transitions d'état et tests exploratoires
+├── 06-tests-unitaires/   rapport des tests unitaires, résumé de couverture
+└── captures/             preuves
+```
+
+Les scripts automatisés se placent dans les dossiers standards du projet : `tests/` pour PHPUnit, `docs-test/postman/` pour Postman, `e2e/` pour Playwright.
 
 ## 
 
