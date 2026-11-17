@@ -4,7 +4,7 @@
 |---|---|
 | Identifiant | ANO-005 |
 | Date de détection | 14/11/2026 |
-| Détectée par | Hyba Ezzar et emna zaydoun(test automatisé UT-04) |
+| Détectée par | Hyba Ezzar (test automatisé UT-04) |
 | Module | Contrats > Vente (`VenteController::store`) |
 | Cas de test lié | TC-VEH-07 (revendre un véhicule déjà vendu) ; transition TT-VEH-04 de la semaine 5 |
 | Exigence / risque | EX-VEH-05 / R1 ; règle RG3 ; hypothèse A3 (un véhicule vendu ne peut plus être vendu) |
@@ -13,7 +13,7 @@
 
 ## 1. Résumé
 
-`VenteController::store` refuse la vente d'une voiture à l'état `location`, mais **pas** celle d'une voiture à l'état `vendue`. Un appel direct à l'API enregistre donc une seconde vente sur une voiture déjà vendue (code HTTP 201). L'interface masque les voitures vendues dans le formulaire, ce qui cache le défaut sans le corriger.
+`VenteController::store` ne contrôle que l'état `location` (valeur que l'application n'écrit pas, voir ANO-007) et ne contrôle pas l'état `vendue`. Un appel direct à l'API enregistre donc une seconde vente sur une voiture déjà vendue (code HTTP 201). L'interface masque les voitures vendues dans le formulaire, ce qui cache le défaut sans le corriger.
 
 Cette anomalie est la cause probable des deux ventes observées sur la voiture `12345-A-67` en semaine 5.
 
@@ -48,15 +48,20 @@ Une voiture déjà vendue ne doit pas pouvoir être revendue (TC-VEH-07).
 Failed asserting that 201 is equal to 400 or is greater than 400.
 ```
 
-Le test témoin sur une voiture à l'état `location` réussit : le contrôleur refuse ce cas (code 400).
+Le cas d'une voiture en location est lui aussi accepté (voir ANO-007) ; le test témoin d'une vente valide sur une voiture disponible réussit.
 
 ## 6. Preuves
 
 | Fichier | Contenu |
 |---|---|
-| [`S6_09_tests_vente_etat.png`](../captures/S6_09_tests_vente_etat.png) | Résultat de `VenteEtatTest` : 1 réussi (location), 1 échec (déjà vendue, code 201) |
+| [`S6_09_tests_vente_etat.png`](../captures/S6_09_tests_vente_etat.png) | Résultat de `VenteEtatTest` : 2 échecs (en location, déjà vendue, code 201) et 1 réussite (vente valide) |
 | [`S6_12_suite_complete.png`](../captures/S6_12_suite_complete.png) | Suite complète : le même échec est reproduit |
 | [`S5_12_liste_vente.png`](../captures/S5_12_liste_vente.png) | Liste du formulaire Vente : l'interface ne propose pas les voitures vendues |
+
+<p>
+<a href="../captures/S6_09_tests_vente_etat.png"><img src="../captures/S6_09_tests_vente_etat.png" width="260" alt="S6_09_tests_vente_etat.png"></a>
+<a href="../captures/S6_12_suite_complete.png"><img src="../captures/S6_12_suite_complete.png" width="260" alt="S6_12_suite_complete.png"></a>
+</p>
 
 ## 7. Classification
 
@@ -66,3 +71,10 @@ Le test témoin sur une voiture à l'état `location` réussit : le contrôleur 
 | Priorité | **P1** | À corriger avant la campagne finale ; le plan (`S2`, section 12) cite « double vente possible » parmi les motifs de refus de livraison |
 | Reproductibilité | 2 exécutions sur 2 | Test lancé seul, puis dans la suite complète |
 
+## 8. Analyse et suites
+
+- **Cause constatée** dans le code : `VenteController::store` ne compare l'état de la voiture qu'à `'location'` ; aucun test sur `'vendue'` (ni sur un état de maintenance).
+- **Contournement** : aucun côté serveur. L'interface empêche le cas dans l'usage normal, mais un appel direct à l'API (Postman, script) l'enregistre.
+- **À rejouer** en semaine 8 avec Postman (`POST /api/ventes` sur une voiture vendue) pour confirmer le comportement par la route réelle.
+- Après correction, ce test devient un test de régression (suite minimale, risque R1 de niveau 9).
+- Tant que cette anomalie est ouverte sans contournement serveur, la décision de livraison est un **refus** (`S2`, section 12).

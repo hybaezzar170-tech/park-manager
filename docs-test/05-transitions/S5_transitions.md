@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.0 (semaine 5 terminée) |
 | Date | 13/11/2026 |
-| Auteure | emna zaydoun et Hyba Ezzar |
+| Auteure | Hyba Ezzar |
 | Documents liés | `S3_exigences_tracabilite.md`, `S4_cas_de_test.md` |
 
 ## 1. Écarts avec le référentiel du sujet
@@ -116,6 +116,40 @@ Remarque : la fiche de `q` affiche la maintenance terminée sous « Maintenances
 | 5.2 | Exécuter les transitions TT-VEH-01 à 10 et noter les résultats observés | **Fait** au niveau interface ; niveau API en semaine 8 |
 | 5.3 | Session exploratoire (3 missions : formulaire Vente, bouton Désactiver, alertes) | **Fait** |
 | 5.4 | Fiches d'anomalie et registre (ANO-001 à ANO-004, `registre_anomalies.md`) | **Fait** |
+
+## 7. Index des captures
+
+Toutes les captures sont rangées dans [`docs-test/captures/`](../captures/). Un clic sur un nom de fichier ouvre l'image.
+
+| Fichier | Aperçu (clic pour ouvrir) | Contenu | Utilisé par |
+|---|---|---|---|
+| [`S5_01_vente_prix_negatif.png`](../captures/S5_01_vente_prix_negatif.png) | <a href="../captures/S5_01_vente_prix_negatif.png"><img src="../captures/S5_01_vente_prix_negatif.png" width="140" alt="S5_01_vente_prix_negatif.png"></a> | Formulaire Vente avec le prix -5555 et message « Vente enregistrée » | ANO-001 |
+| [`S5_02_fiche_vente_negative.png`](../captures/S5_02_fiche_vente_negative.png) | <a href="../captures/S5_02_fiche_vente_negative.png"><img src="../captures/S5_02_fiche_vente_negative.png" width="140" alt="S5_02_fiche_vente_negative.png"></a> | Fiche de `90004-T-04` : VENDUE, vente à -5555.00 DT | ANO-001 |
+| [`S5_03_desactiver_erreur.png`](../captures/S5_03_desactiver_erreur.png) | <a href="../captures/S5_03_desactiver_erreur.png"><img src="../captures/S5_03_desactiver_erreur.png" width="140" alt="S5_03_desactiver_erreur.png"></a> | Alerte « Erreur lors de la désactivation de la voiture » | ANO-002 |
+| [`S5_04_console_404.png`](../captures/S5_04_console_404.png) | <a href="../captures/S5_04_console_404.png"><img src="../captures/S5_04_console_404.png" width="140" alt="S5_04_console_404.png"></a> | Console : PUT `/api/voitures/2/desactiv…` 404, `GestionVoitures.jsx:259` | ANO-002 |
+| [`S5_05_voiture_inchangee.png`](../captures/S5_05_voiture_inchangee.png) | <a href="../captures/S5_05_voiture_inchangee.png"><img src="../captures/S5_05_voiture_inchangee.png" width="140" alt="S5_05_voiture_inchangee.png"></a> | Ligne `98765-B-89` toujours DISPONIBLE | ANO-002 |
+| [`S5_06_assurance_vehicule_vendu.png`](../captures/S5_06_assurance_vehicule_vendu.png) | <a href="../captures/S5_06_assurance_vehicule_vendu.png"><img src="../captures/S5_06_assurance_vehicule_vendu.png" width="140" alt="S5_06_assurance_vehicule_vendu.png"></a> | Formulaire Assurance de `90004-T-04` et message de succès | ANO-003 |
+| [`S5_07_alerte_vehicule_vendu.png`](../captures/S5_07_alerte_vehicule_vendu.png) | <a href="../captures/S5_07_alerte_vehicule_vendu.png"><img src="../captures/S5_07_alerte_vehicule_vendu.png" width="140" alt="S5_07_alerte_vehicule_vendu.png"></a> | Page Alertes avec la ligne de `90004-T-04` | ANO-003 |
+| [`S5_08_alertes_temps_restant.png`](../captures/S5_08_alertes_temps_restant.png) | <a href="../captures/S5_08_alertes_temps_restant.png"><img src="../captures/S5_08_alertes_temps_restant.png" width="140" alt="S5_08_alertes_temps_restant.png"></a> | Page Alertes : « Aujourd'hui » (14/11) et « Dans 2 jour(s) » (16/11) | ANO-003, ANO-004 |
+| [`S5_09_heure_poste.png`](../captures/S5_09_heure_poste.png) | <a href="../captures/S5_09_heure_poste.png"><img src="../captures/S5_09_heure_poste.png" width="140" alt="S5_09_heure_poste.png"></a> | Horloge du poste : 13/11/2026, 21:22 | ANO-004 |
+| [`S5_10_maintenance_terminee_a.png`](../captures/S5_10_maintenance_terminee_a.png) | <a href="../captures/S5_10_maintenance_terminee_a.png"><img src="../captures/S5_10_maintenance_terminee_a.png" width="140" alt="S5_10_maintenance_terminee_a.png"></a> | Message « Maintenance terminée ! La voiture est maintenant disponible. » | TT-VEH-09 |
+| [`S5_10_maintenance_terminee_b.png`](../captures/S5_10_maintenance_terminee_b.png) | <a href="../captures/S5_10_maintenance_terminee_b.png"><img src="../captures/S5_10_maintenance_terminee_b.png" width="140" alt="S5_10_maintenance_terminee_b.png"></a> | Catalogue : `q` DISPONIBLE | TT-VEH-09 |
+| [`S5_10_maintenance_terminee_c.png`](../captures/S5_10_maintenance_terminee_c.png) | <a href="../captures/S5_10_maintenance_terminee_c.png"><img src="../captures/S5_10_maintenance_terminee_c.png" width="140" alt="S5_10_maintenance_terminee_c.png"></a> | Fiche de `q` : DISPONIBLE, maintenance de 4.65 DT | TT-VEH-09 |
+| [`S5_11_liste_maintenance.png`](../captures/S5_11_liste_maintenance.png) | <a href="../captures/S5_11_liste_maintenance.png"><img src="../captures/S5_11_liste_maintenance.png" width="140" alt="S5_11_liste_maintenance.png"></a> | Page Maintenance : liste « Voitures Disponibles » | TT-VEH-06, 08 |
+| [`S5_12_liste_vente.png`](../captures/S5_12_liste_vente.png) | <a href="../captures/S5_12_liste_vente.png"><img src="../captures/S5_12_liste_vente.png" width="140" alt="S5_12_liste_vente.png"></a> | Liste déroulante des voitures du formulaire Vente | TT-VEH-04, 07 |
+| [`S5_13_liste_location.png`](../captures/S5_13_liste_location.png) | <a href="../captures/S5_13_liste_location.png"><img src="../captures/S5_13_liste_location.png" width="140" alt="S5_13_liste_location.png"></a> | Liste à cocher des voitures du formulaire Location | TT-VEH-05 |
+| [`S5_14_liste_location_sans_5555.png`](../captures/S5_14_liste_location_sans_5555.png) | <a href="../captures/S5_14_liste_location_sans_5555.png"><img src="../captures/S5_14_liste_location_sans_5555.png" width="140" alt="S5_14_liste_location_sans_5555.png"></a> | Liste Location sans `5555` | TT-VEH-10 |
+| [`S5_15_location_dates_futures_a.png`](../captures/S5_15_location_dates_futures_a.png) | <a href="../captures/S5_15_location_dates_futures_a.png"><img src="../captures/S5_15_location_dates_futures_a.png" width="140" alt="S5_15_location_dates_futures_a.png"></a> | Message « 1 location(s) enregistrée(s) avec succès ! » (`5555`, 29/11 au 30/11) | A11 |
+| [`S5_15_location_dates_futures_b.png`](../captures/S5_15_location_dates_futures_b.png) | <a href="../captures/S5_15_location_dates_futures_b.png"><img src="../captures/S5_15_location_dates_futures_b.png" width="140" alt="S5_15_location_dates_futures_b.png"></a> | Fiche de `5555` : EN LOCATION et location du 29/11 | A11 |
+| [`S5_16_location_dates_passees_a.png`](../captures/S5_16_location_dates_passees_a.png) | <a href="../captures/S5_16_location_dates_passees_a.png"><img src="../captures/S5_16_location_dates_passees_a.png" width="140" alt="S5_16_location_dates_passees_a.png"></a> | Formulaire Location de `q` (04/11 au 05/11) | TT-VEH-02 |
+| [`S5_16_location_dates_passees_b.png`](../captures/S5_16_location_dates_passees_b.png) | <a href="../captures/S5_16_location_dates_passees_b.png"><img src="../captures/S5_16_location_dates_passees_b.png" width="140" alt="S5_16_location_dates_passees_b.png"></a> | Fiche de `q` : DISPONIBLE et deux locations | TT-VEH-02 |
+| [`S5_17_achat_vente_90001_a.png`](../captures/S5_17_achat_vente_90001_a.png) | <a href="../captures/S5_17_achat_vente_90001_a.png"><img src="../captures/S5_17_achat_vente_90001_a.png" width="140" alt="S5_17_achat_vente_90001_a.png"></a> | Formulaire Achat de `90001-T-01` | TC-VEH-01 |
+| [`S5_17_achat_vente_90001_b.png`](../captures/S5_17_achat_vente_90001_b.png) | <a href="../captures/S5_17_achat_vente_90001_b.png"><img src="../captures/S5_17_achat_vente_90001_b.png" width="140" alt="S5_17_achat_vente_90001_b.png"></a> | Catalogue : `90001-T-01` DISPONIBLE | TC-VEH-01 |
+| [`S5_17_achat_vente_90001_c.png`](../captures/S5_17_achat_vente_90001_c.png) | <a href="../captures/S5_17_achat_vente_90001_c.png"><img src="../captures/S5_17_achat_vente_90001_c.png" width="140" alt="S5_17_achat_vente_90001_c.png"></a> | Formulaire Vente de `90001-T-01` | TT-VEH-03 |
+| [`S5_17_achat_vente_90001_d.png`](../captures/S5_17_achat_vente_90001_d.png) | <a href="../captures/S5_17_achat_vente_90001_d.png"><img src="../captures/S5_17_achat_vente_90001_d.png" width="140" alt="S5_17_achat_vente_90001_d.png"></a> | Catalogue : `90001-T-01` VENDUE | TT-VEH-03 |
+| [`S5_18_requetes_phpmyadmin_a.png`](../captures/S5_18_requetes_phpmyadmin_a.png) | <a href="../captures/S5_18_requetes_phpmyadmin_a.png"><img src="../captures/S5_18_requetes_phpmyadmin_a.png" width="140" alt="S5_18_requetes_phpmyadmin_a.png"></a> | Requête sur `expiration_alerts` : résultat vide | TC-ALR-03 |
+| [`S5_18_requetes_phpmyadmin_b.png`](../captures/S5_18_requetes_phpmyadmin_b.png) | <a href="../captures/S5_18_requetes_phpmyadmin_b.png"><img src="../captures/S5_18_requetes_phpmyadmin_b.png" width="140" alt="S5_18_requetes_phpmyadmin_b.png"></a> | Requête sur `assurances` : lignes id 4 et 5 | TC-ALR-03 |
+
 ## 8. Bilan de la semaine 5
 
 ### 8.1 Transitions
@@ -123,7 +157,7 @@ Remarque : la fiche de `q` affiche la maintenance terminée sous « Maintenances
 | Catégorie | Cas | Résultat |
 |---|---|---|
 | Transitions autorisées | TT-VEH-01, 02, 03, 09 | 4 sur 4 réussies |
-| Transitions interdites | TT-VEH-04, 05, 06, 07, 08, 10 | 6 sur 6 bloquées **par l'interface** ; niveau API non testé |
+| Transitions interdites | TT-VEH-04, 05, 06, 07, 08, 10 | 6 sur 6 bloquées **par l'interface** ; testées ensuite au niveau serveur (semaines 6 et 7), les transitions TT-VEH-04 et TT-VEH-07 sont acceptées (ANO-005, ANO-007) |
 
 ### 8.2 Cas du catalogue S4 touchés cette semaine
 
@@ -152,3 +186,17 @@ Quatre anomalies, détaillées dans `registre_anomalies.md` : 1 critique (ANO-00
 - La session exploratoire s'est faite en trois missions, sans chronométrage.
 - Plusieurs anomalies reposent sur une seule série d'essais, ou sur une hypothèse à confirmer (A5, A11, A12).
 
+### 8.5 Points ouverts
+
+| Point | Action |
+|---|---|
+| A5, A11, A12 | Confirmer avec l'encadrant |
+| ANO-001 | Reproduire avec les prix `0` et `-1` sur une nouvelle voiture |
+| ANO-002 | Relever la fin exacte de l'URL et chercher un contournement |
+| TC-ALR-01 | Tester les échéances à J+31, J+30 et J+29 |
+| Niveau API | Rejouer les transitions interdites et ANO-001, ANO-002 avec Postman (semaine 8) |
+| ANO-004 | Test unitaire du calcul du temps restant (semaine 6) |
+
+### 8.6 Données de test créées pendant la semaine
+
+Voitures `90001-T-01` et `90004-T-04` (toutes deux VENDUES) ; assurance de `90004-T-04` (expirant le 14/11/2026) ; assurance de `12345-A-67` expirant le 16/11/2026 ; locations de `5555` (29/11 au 30/11/2026) et de `q` (04/11 au 05/11/2026) ; maintenance terminée de `q`. Ces données restent visibles dans l'application et seront à nettoyer ou à signaler dans le rapport final.

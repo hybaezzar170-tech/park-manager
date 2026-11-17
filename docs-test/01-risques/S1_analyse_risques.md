@@ -77,3 +77,27 @@ Priorité : **6 à 9 = élevée**, **3 à 4 = moyenne**, **1 à 2 = faible**. Le
 
 Les captures confirment que les risques les plus élevés se concentrent sur les **contrats** (double vente, montants aberrants), les **alertes** (doublons, véhicule vendu toujours concerné) et la **qualité des données saisies** (doublons, formats). Les tests des semaines 4 à 9 sont orientés d'abord vers ces domaines.
 
+## 6. Mise à jour après la semaine 5
+
+Le registre de la section 3 reste l'évaluation initiale. Ce tableau indique ce que les tests de la semaine 5 ont confirmé ou laissé ouvert.
+
+| Risque | Constat en semaine 5 | Anomalie | Suite |
+|---|---|---|---|
+| R1 | L'interface exclut les voitures vendues et en location des formulaires de vente, de location et de maintenance ; les deux ventes de `12345-A-67` restent inexpliquées ; le serveur n'a pas été testé | Aucune | Niveau 9 maintenu ; à vérifier avec Postman (semaine 8) |
+| R2 | Une vente à prix négatif est acceptée ; des prix très élevés sont acceptés | ANO-001 | **Confirmé** (niveau 9) |
+| R3 | Alerte générée pour un véhicule vendu ; temps restant décalé d'un jour ; le « doublon » observé vient de deux assurances distinctes | ANO-003, ANO-004 | **Confirmé** (niveau 6) |
+| R5 | La plupart des routes de `routes/api.php` sont déclarées hors du groupe `auth:sanctum` | Aucune (non testé) | Indice fort ; à vérifier avec Postman (TC-SEC-03) |
+| R8 | Marque et modèle incohérents acceptés ; deux assurances de même type qui se chevauchent acceptées | Aucune | Indices ; règles à confirmer (A12) |
+| R13 | Le bouton Désactiver appelle une route inexistante (404) | ANO-002 | **Confirmé** ; niveau 4 maintenu pour l'instant, à réévaluer (une défaillance observée suggère une probabilité de 3) |
+| R4, R6, R7, R9, R10, R11, R14 | Non testés en semaine 5 | Aucune | À traiter aux semaines 6 à 9 |
+
+## 7. Mise à jour après la semaine 6
+
+| Risque | Constat en semaine 6 | Anomalie | Suite |
+|---|---|---|---|
+| R1 | Le serveur accepte la vente d'une voiture déjà vendue, et celle d'une voiture en location (le contrôle compare à `location`, valeur que l'application n'écrit pas : elle écrit `en_location`) | ANO-005, ANO-007 | **Confirmé** au niveau serveur (niveau 9) |
+| R2 | Le serveur accepte un prix de vente négatif (validation sans minimum) | ANO-001 | **Confirmé** par test automatisé (niveau 9) |
+| R3 | Alerte pour un véhicule vendu ; temps restant décalé d'un jour ; seuils réels de 3 et 1 jours | ANO-003, ANO-004 | **Confirmé** par tests automatisés (niveau 6) |
+| R4 | Une pièce sans stock est rattachée à une réparation ; le stock ne devient jamais négatif | ANO-006 | **Confirmé** partiellement (niveau 6) ; effet à la modification et à la suppression à vérifier en semaine 7 |
+| R10 | Une date de fin antérieure au début est refusée par la validation | Aucune | Contrôle conforme (UT-01) |
+| R5, R6, R7, R9, R11, R14 | Non testés à ce jour | Aucune | Semaines 7 à 9 |
