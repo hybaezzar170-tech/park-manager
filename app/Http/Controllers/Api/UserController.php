@@ -153,8 +153,7 @@ class UserController extends Controller
         }
 
         // Créer un token simple (vous pouvez utiliser Laravel Sanctum pour plus de sécurité)
-        $token = base64_encode($user->id . ':' . $user->email . ':' . time());
-
+$token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
             'message' => 'Connexion réussie',
             'user' => $user,

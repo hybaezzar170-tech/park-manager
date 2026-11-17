@@ -164,8 +164,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Email ou mot de passe incorrect'], 401);
         }
 
-        $token = base64_encode($user->id . ':' . $user->email . ':' . time());
-
+$token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
             'message' => 'Connexion réussie',
             'user' => $user,

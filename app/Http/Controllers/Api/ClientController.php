@@ -120,9 +120,11 @@ class ClientController extends Controller
         }
 
         // Vérifier si le client a des locations en cours
-        $locationsEnCours = $client->locations()->where('etat', 'en_cours')->count();
-        
-        if ($locationsEnCours > 0) {
+    $nomComplet = $client->nom . ' ' . $client->prenom;
+
+        $locationsEnCours = \App\Models\Location::where('client', $nomComplet)
+            ->where('etat', 'en_cours')
+            ->count();        if ($locationsEnCours > 0) {
             return response()->json([
                 'message' => 'Impossible de supprimer un client avec des locations en cours',
                 'error' => 'Ce client a ' . $locationsEnCours . ' location(s) en cours'
