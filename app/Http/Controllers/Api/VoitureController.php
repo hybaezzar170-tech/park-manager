@@ -159,22 +159,35 @@ class VoitureController extends Controller
     }
 
     // 🔹 Supprimer voiture (avec sécurité)
-    public function destroy($id)
-    {
-        $voiture = Voiture::find($id);
+    
+public function destroy($id)
+{
+    $voiture = Voiture::find($id);
 
-        if (!$voiture) {
-            return response()->json(['message' => 'Voiture introuvable'], 404);
-        }
-
-        if ($voiture->etat === 'en_location') {
-            return response()->json([
-                'message' => 'Impossible de supprimer une voiture en location'
-            ], 400);
-        }
-
-        $voiture->delete();
-
-        return response()->json(['message' => 'Voiture supprimée avec succès'], 200);
+    if (!$voiture) {
+        return response()->json([
+            'message' => 'Voiture introuvable'
+        ], 404);
     }
+
+    if ($voiture->etat === 'en_location') {
+        return response()->json([
+            'message' => 'Impossible de supprimer une voiture en location'
+        ], 400);
+    }
+
+    // Proteger l'historique des ventes
+    if ($voiture->ventes()->exists()) {
+        return response()->json([
+            'message' => 'Impossible de supprimer cette voiture : elle possède un historique de ventes.'
+        ], 409);
+    }
+
+    $voiture->delete();
+
+    return response()->json([
+        'message' => 'Voiture supprimée avec succès'
+    ], 200);
+}
+
 }

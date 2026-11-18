@@ -70,7 +70,7 @@ class OuvrierController extends Controller
             'prenom' => 'required|string|max:255',
             'type' => 'required|in:technicien,mecanicien',
             'telephone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
+'email' => 'nullable|email|max:255|unique:ouvriers,email',
             'salaire' => 'nullable|numeric|min:0',
             'date_embauche' => 'nullable|date',
             'statut' => 'nullable|in:actif,inactif',

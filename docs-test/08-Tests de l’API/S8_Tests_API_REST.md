@@ -1,11 +1,11 @@
-# S8 — Rapport de tests de l’API REST ALBA
+# S8 — Rapport de tests de l’API REST ALBA_park manager
 
 | Champ | Valeur |
 |---|---|
 | Identifiant | S8-API-REST |
 | Date d’exécution | 17/11/2026 |
-| Réalisé par | Hyba ezzar et emna zaydoun — DSI |
-| Application | ALBA — Gestion de parc automobile |
+| Réalisé par | Hyba ezzar et emna zaydoun |
+| Application | ALBA — Gestion de park manager  |
 | Module | API REST — Authentification, Voitures, Clients et Locations |
 | Outil de test | Postman |
 | Environnement | Laravel 10.50.0, PHP 8.1.2, MySQL |

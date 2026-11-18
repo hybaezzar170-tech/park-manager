@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Http\Request;
@@ -23,69 +24,78 @@ use App\Http\Controllers\Api\AssuranceController;
 use App\Http\Controllers\Api\ReclamationController;
 use App\Http\Controllers\Api\TaxeCirculationController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-*/
-
-// Login
+// Routes publiques : authentification uniquement
 Route::post('login', [UserController::class, 'login']);
+Route::post('conducteurs/login', [ConducteurController::class, 'login']);
 
-// Protected routes (require authentication)
+// Toutes les autres routes nécessitent un token Sanctum valide
 Route::middleware('auth:sanctum')->group(function () {
 
-    // User info
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
 
-    // Resources
-    // Route::apiResource('users', UserController::class); // Déplacé vers les routes publiques
-});
+    // Utilisateurs
+    Route::apiResource('users', UserController::class);
 
-// Public routes (no authentication required)
-Route::apiResource('users', UserController::class);
-Route::apiResource('voitures', VoitureController::class);
-Route::get('voitures/{id}/details', [VoitureController::class, 'details']);
-Route::get('departements/all', [DepartementController::class, 'allDepartements']);
-Route::put('departements/{id}/toggle-etat', [DepartementController::class, 'toggleEtat']);
-Route::apiResource('departements', DepartementController::class);
-Route::put('conducteurs/{id}/toggle-etat', [ConducteurController::class, 'toggleEtat']);
-Route::post('conducteurs/login', [ConducteurController::class, 'login']);
-Route::apiResource('conducteurs', ConducteurController::class);
-Route::apiResource('fournisseurs', FournisseurController::class);
-Route::apiResource('pieces', PieceController::class);
-Route::apiResource('alertes', AlerteController::class);
-Route::apiResource('visites', VisiteController::class);
-Route::apiResource('expiration-alerts', ExpirationAlertController::class);
-Route::apiResource('ventes', VenteController::class);
-Route::apiResource('locations', LocationController::class);
-Route::post('locations/bulk', [LocationController::class, 'bulkStore']);
-Route::apiResource('taxes', TaxeController::class);
-Route::apiResource('assurances', AssuranceController::class);
-Route::apiResource('taxes-circulation', TaxeCirculationController::class);
-Route::apiResource('reparations', ReparationController::class);
-Route::apiResource('ouvriers', OuvrierController::class);
-Route::apiResource('maintenances', MaintenanceController::class);
+    // Voitures
+    Route::apiResource('voitures', VoitureController::class);
+    Route::get('voitures/{id}/details', [VoitureController::class, 'details']);
+    Route::get('voitures/{voitureId}/maintenances', [MaintenanceController::class, 'getMaintenanceHistory']);
 
-// Routes pour la gestion des clients
-Route::apiResource('clients', ClientController::class);
-Route::get('clients/search', [ClientController::class, 'search']);
+    // Départements
+    Route::get('departements/all', [DepartementController::class, 'allDepartements']);
+    Route::put('departements/{id}/toggle-etat', [DepartementController::class, 'toggleEtat']);
+    Route::apiResource('departements', DepartementController::class);
 
-    // Extra routes
+    // Conducteurs
+    Route::put('conducteurs/{id}/toggle-etat', [ConducteurController::class, 'toggleEtat']);
+    Route::apiResource('conducteurs', ConducteurController::class);
+
+    // Fournisseurs
+    Route::apiResource('fournisseurs', FournisseurController::class);
     Route::get('fournisseurs/pieces-suppliers', [FournisseurController::class, 'piecesSuppliers']);
+
+    // Pièces
+    Route::apiResource('pieces', PieceController::class);
     Route::get('pieces/with-auto-suppliers', [PieceController::class, 'piecesWithAutoSuppliers']);
-    Route::get('statistics', [StatisticsController::class, 'index']);
+
+    // Alertes et visites
+    Route::apiResource('alertes', AlerteController::class);
+    Route::apiResource('visites', VisiteController::class);
+    Route::apiResource('expiration-alerts', ExpirationAlertController::class);
+
+    // Ventes et locations
+    Route::apiResource('ventes', VenteController::class);
+    Route::apiResource('locations', LocationController::class);
+    Route::post('locations/bulk', [LocationController::class, 'bulkStore']);
+
+    // Taxes et assurances
+    Route::apiResource('taxes', TaxeController::class);
+    Route::apiResource('assurances', AssuranceController::class);
+    Route::apiResource('taxes-circulation', TaxeCirculationController::class);
+
+    // Réparations et ouvriers
+    Route::apiResource('reparations', ReparationController::class);
+    Route::apiResource('ouvriers', OuvrierController::class);
     Route::get('ouvriers/actifs', [OuvrierController::class, 'actifs']);
     Route::get('ouvriers/type/{type}', [OuvrierController::class, 'byType']);
     Route::get('ouvriers/statistics', [OuvrierController::class, 'statistics']);
-   Route::get('maintenances/active', [MaintenanceController::class, 'getActiveMaintenances']);
-Route::put('maintenances/{maintenance}', [MaintenanceController::class, 'update']);
-Route::post('maintenances', [MaintenanceController::class, 'store']);
-    Route::get('voitures/{voitureId}/maintenances', [MaintenanceController::class, 'getMaintenanceHistory']);
+
+    // Maintenances
+    Route::apiResource('maintenances', MaintenanceController::class);
+    Route::get('maintenances/active', [MaintenanceController::class, 'getActiveMaintenances']);
     Route::post('maintenances/check-expired', [MaintenanceController::class, 'checkExpiredServices']);
+
+    // Clients
+    Route::get('clients/search', [ClientController::class, 'search']);
+    Route::apiResource('clients', ClientController::class);
+
+    // Statistiques
+    Route::get('statistics', [StatisticsController::class, 'index']);
+
+    // Réclamations
     Route::get('reclamations/user', [ReclamationController::class, 'getUserReclamations']);
     Route::get('reclamations/statistics', [ReclamationController::class, 'getStatistics']);
-Route::apiResource('reclamations', ReclamationController::class);
-Route::put('reclamations/{reclamation}', [ReclamationController::class, 'update']);
+    Route::apiResource('reclamations', ReclamationController::class);
+});

@@ -2,23 +2,36 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\Sanctum;
 use Tests\Support\DonneesDeTest;
 use Tests\TestCase;
 
-/**
- * IT-01 : cycle complet d'une voiture à travers les vraies routes HTTP, avec
- * vérification de l'état de la base à chaque étape (persistance).
- * Cas de test : TC-VEH-01 / Exigence : EX-VEH-01 / Risque : R8.
- */
 class VoitureCrudTest extends TestCase
 {
     use DatabaseTransactions, DonneesDeTest;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $user = User::create([
+            'name' => 'TEST Admin',
+            'email' => 'test.crud.voiture@example.com',
+            'password' => Hash::make('Password123!'),
+            'role' => 'admin',
+        ]);
+
+        Sanctum::actingAs($user);
+    }
 
     public function test_cycle_creer_lire_modifier_supprimer_une_voiture(): void
     {
         // Arrange : un département et les données d'une voiture valide
         $departementId = $this->creerDepartement();
+
         $donnees = [
             'matricule'           => 'TEST-IT-100',
             'modele'              => 'Peugeot 208',
@@ -30,23 +43,41 @@ class VoitureCrudTest extends TestCase
             'carburant'           => 'Essence',
         ];
 
-        // Act + Assert : création, la ligne existe en base à l'état « disponible »
+        // Création
         $creation = $this->postJson('/api/voitures', $donnees);
+
         $creation->assertStatus(201);
-        $this->assertDatabaseHas('voitures', ['matricule' => 'TEST-IT-100', 'etat' => 'disponible']);
+
+        $this->assertDatabaseHas('voitures', [
+            'matricule' => 'TEST-IT-100',
+            'etat' => 'disponible',
+        ]);
+
         $id = $creation->json('data.id');
 
-        // Lecture : la voiture est retrouvée par son identifiant
+        // Lecture
         $this->getJson("/api/voitures/{$id}")
             ->assertStatus(200)
-            ->assertJsonFragment(['matricule' => 'TEST-IT-100']);
+            ->assertJsonFragment([
+                'matricule' => 'TEST-IT-100',
+            ]);
 
-        // Modification : la nouvelle valeur est persistée
-        $this->putJson("/api/voitures/{$id}", ['couleur' => 'Blanc'])->assertStatus(200);
-        $this->assertDatabaseHas('voitures', ['id' => $id, 'couleur' => 'Blanc']);
+        // Modification
+        $this->putJson("/api/voitures/{$id}", [
+            'couleur' => 'Blanc',
+        ])->assertStatus(200);
 
-        // Suppression : la ligne a disparu de la base
-        $this->deleteJson("/api/voitures/{$id}")->assertStatus(200);
-        $this->assertDatabaseMissing('voitures', ['id' => $id]);
+        $this->assertDatabaseHas('voitures', [
+            'id' => $id,
+            'couleur' => 'Blanc',
+        ]);
+
+        // Suppression
+        $this->deleteJson("/api/voitures/{$id}")
+            ->assertStatus(200);
+
+        $this->assertDatabaseMissing('voitures', [
+            'id' => $id,
+        ]);
     }
 }
